@@ -1,13 +1,13 @@
-namespace Flocking {
-    using Unity.Collections;
-    using Unity.Jobs;
-    using UnityEngine;
-    using UnityEngine.Rendering;
+using Unity.Collections;
+using Unity.Jobs;
+using UnityEngine;
+using UnityEngine.Rendering;
 
+namespace Flocking {
     public abstract class FlockingBehaviour : MonoBehaviour {
         #region Constants for Declarations
 
-        // avoiding hard coding errors
+        // avoiding hard code errors
         private const string TargetPointPos = "targetPointPos";
         private const string RepulsionPointPos = "repulsionPointPos";
         private const string DeltaTime = "DeltaTime";
@@ -195,10 +195,8 @@ namespace Flocking {
         private Material GetDefaultMaterial() {
             return GraphicsSettings.defaultRenderPipeline == null
                 ? defaultMat
-                :
-                GraphicsSettings.defaultRenderPipeline.default2DMaterial != null
-                    ?
-                    GraphicsSettings.defaultRenderPipeline.default2DMaterial
+                : GraphicsSettings.defaultRenderPipeline.default2DMaterial != null
+                    ? GraphicsSettings.defaultRenderPipeline.default2DMaterial
                     : GraphicsSettings.defaultRenderPipeline.defaultMaterial;
         }
     }
