@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GameManagement {
+namespace LevelManagement.Core {
     
     /// <summary>
     /// Return an Instance of a singleton which inherits from MonoBehaviour

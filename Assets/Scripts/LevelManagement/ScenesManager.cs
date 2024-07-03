@@ -1,7 +1,8 @@
+using LevelManagement.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace GameManagement {
+namespace LevelManagement {
     public class ScenesManager : Singleton<ScenesManager>
     {
         public void LoadScene(Scene scene) {
