@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Flocking.unity
     guid: 2dfd887f015245245b5c8edee1abbf0d
+  - enabled: 1
+    path: Assets/Scenes/CCA.unity
+    guid: 5023197842fcae84fa53bf3fdef4c515
   m_configObjects: {}

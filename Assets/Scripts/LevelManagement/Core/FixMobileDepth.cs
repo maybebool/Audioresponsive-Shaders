@@ -1,10 +1,13 @@
 using UnityEngine;
 
-[ExecuteInEditMode]
-public class FixMobileDepth : MonoBehaviour
-{
-    private void Awake()
+namespace LevelManagement.Core {
+    
+    [ExecuteInEditMode]
+    public class FixMobileDepth : MonoBehaviour
     {
-        GetComponent<Camera>().depthTextureMode |= DepthTextureMode.Depth;
+        private void Awake()
+        {
+            GetComponent<Camera>().depthTextureMode |= DepthTextureMode.Depth;
+        }
     }
 }

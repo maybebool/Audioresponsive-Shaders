@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace LevelManagement.UIs {
-    public class FlockingUI : MonoBehaviour
+    public class LevelUI : MonoBehaviour
     {
         [SerializeField] private Button backToMenuButton;
         private void OnEnable() {
