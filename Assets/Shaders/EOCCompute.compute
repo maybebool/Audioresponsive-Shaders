@@ -1,0 +1,77 @@
+#pragma enable_d3d11_debug_symbols
+#pragma kernel ResetK
+#pragma kernel StepK
+#pragma kernel RenderK
+
+#define MAX_STATES 15
+
+RWTexture2D<float4> renderT;
+RWTexture2D<int> statesT;
+
+float rez;
+int highState;
+int seed;
+int step;
+
+float t[MAX_STATES * MAX_STATES * MAX_STATES];
+
+
+[numthreads(32, 32, 1)]
+void ResetK(uint3 id : SV_DispatchThreadID)
+{
+    renderT[id.xy] = 0;
+
+    if (id.y == 0 && (abs(id.x - rez / 2.0) < 24))
+    {
+        float r = frac(sin(dot(id.yx, float2(12.9898, 78.233))) * 43758.5453);
+        statesT[id.xy] = round(r * highState);
+    }
+    else
+    {
+        statesT[id.xy] = 0;
+    }
+}
+
+[numthreads(32, 1, 1)]
+void StepK(uint3 id : SV_DispatchThreadID)
+{
+    int lx = id.x == 0 ? rez - 1 : id.x - 1;
+    int l = statesT[int2(lx, step)];
+    int s = statesT[int2(id.x, step)];
+    int rx = (id.x + 1) % rez;
+    int r = statesT[int2(rx, step)];
+
+    int i = l * MAX_STATES * MAX_STATES + s * MAX_STATES + r;
+    int nextSelf = t[i];
+
+    statesT[int2(id.x, step + 1)] = nextSelf;
+}
+
+
+// http://www.chilliant.com/rgb2hsv.html
+float3 HUEtoRGB(in float H)
+{
+    float R = abs(H * 6 - 3) - 1;
+    float G = 2 - abs(H * 6 - 2);
+    float B = 2 - abs(H * 6 - 4);
+    return saturate(float3(R, G, B));
+}
+
+/**
+ * @brief Renders a pixel based on the state value at the given thread ID.
+ *
+ * @param id The thread ID for the current pixel.
+ */
+[numthreads(32, 32, 1)]
+void RenderK(uint3 id : SV_DispatchThreadID)
+{
+    int s = statesT[id.xy];
+    //float3 h = s / (float) highState;
+    float3 h = HUEtoRGB(float(s) / highState);
+    if (s == 0)
+    {
+        h = 0;
+    }
+
+    renderT[id.xy] = float4(h.r, h.g, h.b, 1);
+}
