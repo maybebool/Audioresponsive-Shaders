@@ -85,9 +85,9 @@ namespace Flocking {
         protected abstract void InitializeBoidData();
 
         protected virtual void Awake() {
-            if (useDefaultMaterial == true) {
-                boidPrefab.GetComponent<Renderer>().sharedMaterial = GetDefaultMaterial();
-            }
+            // if (useDefaultMaterial == true) {
+            //     boidPrefab.GetComponent<Renderer>().sharedMaterial = GetDefaultMaterial();
+            // }
 
             //Boids initialisaton, adds all boids to an array.
             boidsArray = new Transform[spawnBoids];
@@ -192,12 +192,12 @@ namespace Flocking {
             }
         }
 
-        private Material GetDefaultMaterial() {
-            return GraphicsSettings.defaultRenderPipeline == null
-                ? defaultMat
-                : GraphicsSettings.defaultRenderPipeline.default2DMaterial != null
-                    ? GraphicsSettings.defaultRenderPipeline.default2DMaterial
-                    : GraphicsSettings.defaultRenderPipeline.defaultMaterial;
-        }
+        // private Material GetDefaultMaterial() {
+        //     return GraphicsSettings.defaultRenderPipeline == null
+        //         ? defaultMat
+        //         : GraphicsSettings.defaultRenderPipeline.default2DMaterial != null
+        //             ? GraphicsSettings.defaultRenderPipeline.default2DMaterial
+        //             : GraphicsSettings.defaultRenderPipeline.defaultMaterial;
+        // }
     }
 }

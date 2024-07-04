@@ -5,10 +5,13 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - defaultMat: {fileID: 2100000, guid: 564b694df425a8640908727c1f6ba267, type: 2}
-  - compute: {instanceID: 0}
-  - boidPrefab: {instanceID: 0}
-  - targetPoint: {instanceID: 0}
-  - repulsionPoint: {instanceID: 0}
+  - compute: {fileID: 7200000, guid: b47a35b31052d9c4bb78755e585e3cea, type: 3}
+  - boidPrefab: {fileID: 799648838598662794, guid: 50c618378af8b7e4ea9acdd41fa87806,
+      type: 3}
+  - targetPoint: {fileID: 707711261525168534, guid: e779e765e5c458f4b95b1bbf79219213,
+      type: 3}
+  - repulsionPoint: {fileID: 2882125203929401828, guid: 37ba855621802804da971b00730ac750,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
