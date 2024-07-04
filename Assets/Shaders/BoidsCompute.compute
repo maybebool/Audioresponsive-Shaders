@@ -1,0 +1,141 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+static const int threadGroupSize = 128;
+
+struct Boid
+{
+    float3 position;
+    float3 forward;
+    float3 raySteer;
+    float steering;
+};
+
+float Angle(float3 f1, float3 f2)
+{
+    return acos(
+        (f1.x * f2.x + f1.y * f2.y + f1.z * f2.z) / sqrt(pow(f1.x, 2) + pow(f1.y, 2) + pow(f1.z, 2)) * sqrt(
+            pow(f2.x, 2) + pow(f2.y, 2) + pow(f2.z, 2)));
+}
+
+float3 targetPointPos;
+float3 repulsionPointPos;
+
+float separationMultiplier;
+float alignmentMultiplier;
+float cohesionMultiplier;
+float leadershipMultiplier;
+float targetPointMultiplier;
+
+float NoClumpingArea;
+float LocalArea;
+float RepulsionArea;
+
+float DeltaTime;
+float Speed;
+int numBoids;
+
+RWStructuredBuffer<Boid> boids;
+
+[numthreads(threadGroupSize,1,1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    //Initialisation of boids data on thread
+    Boid boidA = boids[id.x];
+
+    const float3 zero = float3(0.0, 0.0, 0.0);
+
+    float3 alignmentDirection = zero;
+    float3 separationDirection = zero;
+    float3 cohesionDirection = zero;
+    int separationCount = 1;
+    int localCount = 1;
+
+    float3 tempSteer = zero;
+    float3 leaderSteering = zero;
+
+    float leaderAngle = 180.0;
+    Boid leaderBoid = boidA;
+
+    //Validating BoidA against a new BoidB
+    for (int indexB = 0; indexB < numBoids; indexB++)
+    {
+        //If BoidB doesn't equal BoidA
+        if (indexB != int(id.x))
+        {
+            Boid boidB = boids[indexB];
+
+            //Checking how far away BoidB is from BoidA
+            float3 boidDiff = boidA.position - boidB.position;
+            float boidLength = length(boidDiff);
+
+            //Separation
+            if (boidLength < NoClumpingArea)
+            {
+                separationDirection += boidDiff;
+                separationCount++;
+            }
+
+            //Cohesion and Alignment
+            if (boidLength < LocalArea)
+            {
+                alignmentDirection += boidB.forward;
+                cohesionDirection += boidB.position;
+                localCount++;
+
+                //Calculating a leader Boid
+                float angle = Angle(boidB.position - boidA.position, boidA.forward);
+                if (angle < leaderAngle && angle < 90.0)
+                {
+                    leaderBoid = boidB;
+                    leaderAngle = angle;
+                    tempSteer += normalize(leaderBoid.position - boidA.position) * leadershipMultiplier;
+                }
+            }
+        }
+    }
+
+    //Factoring neighbouring boid count into separation modifier
+    if (separationCount > 1)
+    {
+        separationDirection /= separationCount;
+    }
+
+    //Factoring neighbouring boid count into cohesion and alignment modifier
+    float avg = 1.0 / localCount;
+    alignmentDirection *= avg;
+    cohesionDirection *= avg;
+
+    //Repulsion target calculation
+    float repulsionToBoid = length(repulsionPointPos - boidA.position);
+    if (repulsionToBoid <= RepulsionArea)
+    {
+        tempSteer -= repulsionPointPos - boidA.position;
+    }
+
+    cohesionDirection = normalize(cohesionDirection - boidA.position);
+
+    //Adding them all to a steering value
+    tempSteer += (separationDirection * separationMultiplier) +
+        (alignmentDirection * alignmentMultiplier) +
+        (cohesionDirection * cohesionMultiplier) +
+        ((targetPointPos - boidA.position) * targetPointMultiplier);
+
+    //Accounting for collisions from raycasts
+    if (any(boidA.raySteer))
+    {
+        tempSteer = boidA.raySteer;
+    }
+
+    //Steering correction
+    float steeringCorrection = exp(-boidA.steering * DeltaTime);
+
+    //Steering boid
+    boidA.forward = lerp(tempSteer, normalize(boidA.forward), steeringCorrection);
+
+    //Moving boid
+    boidA.position += boidA.forward * (Speed * DeltaTime);
+
+    //Updating boid position and rotation
+    boids[id.x] = boidA;
+}
