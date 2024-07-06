@@ -1,7 +1,17 @@
+using System;
+using AudioAnalysis;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Flocking {
     public class BoidsCarrier : FlockingBehaviour {
+
+
+        public AudioData audioData;
+        
+        [SerializeField] private bool useScale;
+        [SerializeField] private bool useSpeed;
+        [SerializeField] private Vector2 scaleValueMinMax;
         private BoidConductValues[] _boidValues;
 
         [Header("Collisions")] [SerializeField]
@@ -23,9 +33,21 @@ namespace Flocking {
             }
         }
 
-        private void Update() {
-            ValidateTargetAndRepulsionPoints();
 
+        // TODO fix this problem 
+        private void Start() {
+            var countBand = 0;
+            for (int i = 0; i < boidsArray.Length; i++)
+            {
+                var band = countBand % 8;
+               // boidsArray[i]._audioBand = band;
+                countBand++;
+            }
+        }
+
+        private void Update() {
+            
+            ValidateTargetAndRepulsionPoints();
             
             var boidBuffer = new ComputeBuffer(boidsArray.Length, ComputeBufferSize);
             boidBuffer.SetData(_boidValues);
@@ -50,8 +72,13 @@ namespace Flocking {
                 //Boids movement and steering.
                 boidTransform.position = _boidValues[i].position;
                 boidTransform.rotation = Quaternion.LookRotation(_boidValues[i].forward);
-                
-    
+
+
+                // TODO same problem as above
+                if (useScale) {
+                    //var scale = Mathf.Lerp(scaleValueMinMax.x, scaleValueMinMax.y, audioData._audioBandBuffer[boidsArray[i]])
+                    //boidsArray[i].localScale = new Vector3(scale, scale, scale);
+                }
                 //If boids hit an object, steer out of the way.
                 //Otherwise, raySteer is zero.
                 

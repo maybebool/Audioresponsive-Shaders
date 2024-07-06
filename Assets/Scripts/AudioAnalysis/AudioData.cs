@@ -6,21 +6,19 @@ namespace AudioAnalysis {
 	[RequireComponent (typeof (AudioSource))]
 	public class AudioData : MonoBehaviour {
 		
+		[HideInInspector] public float[] _audioBand, _audioBandBuffer;
+		[HideInInspector] public float _Amplitude, _AmplitudeBuffer;
+		
 		[SerializeField] private AudioSource audioSource;
 		[SerializeField] private AudioClip audioClip;
-
+		
 		//FFT based values for Audio transformation
 		private float[] _samples = new float[512];
-		
-
 		private float[] _frequencyBand = new float[8];
 		private float[] _bandBuffer = new float[8];
 		private float[] _bufferReduction = new float[8];
 		private float[] _frequencyBandHighest = new float[8];
 
-		[HideInInspector] public float[] _audioBand, _audioBandBuffer;
-
-		[HideInInspector] public float _Amplitude, _AmplitudeBuffer;
 		private float _AmplitudeHighest;
 		private float _audioProfile;
 
