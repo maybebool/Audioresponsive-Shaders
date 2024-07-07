@@ -5,9 +5,10 @@ namespace AudioAnalysis {
 	
 	[RequireComponent (typeof (AudioSource))]
 	public class AudioData : MonoBehaviour {
-		
-		[HideInInspector] public float[] _audioBand, _audioBandBuffer;
-		[HideInInspector] public float _Amplitude, _AmplitudeBuffer;
+		[HideInInspector] public float[] audioBand;
+		[HideInInspector] public float[] audioBandBuffer;
+		[HideInInspector] public float amplitude;
+		[HideInInspector] public float amplitudeBuffer;
 		
 		[SerializeField] private AudioSource audioSource;
 		[SerializeField] private AudioClip audioClip;
@@ -25,8 +26,8 @@ namespace AudioAnalysis {
 
 		private void Start() {
 			_audioProfile = 0.5f;
-			_audioBand = new float[8];
-			_audioBandBuffer = new float[8];
+			audioBand = new float[8];
+			audioBandBuffer = new float[8];
 			AudioProfile(_audioProfile);
 			audioSource.clip = audioClip;
 			audioSource.Play();
@@ -56,16 +57,16 @@ namespace AudioAnalysis {
 			float currentAmplitude = 0;
 			float currentAmplitudeBuffer = 0;
 			for (int i = 0; i < 8; i++) {
-				currentAmplitude += _audioBand[i];
-				currentAmplitudeBuffer += _audioBandBuffer[i];
+				currentAmplitude += audioBand[i];
+				currentAmplitudeBuffer += audioBandBuffer[i];
 			}
 
 			if (currentAmplitude > _AmplitudeHighest) {
 				_AmplitudeHighest = currentAmplitude;
 			}
 
-			_Amplitude = currentAmplitude / _AmplitudeHighest;
-			_AmplitudeBuffer = currentAmplitudeBuffer / _AmplitudeHighest;
+			amplitude = currentAmplitude / _AmplitudeHighest;
+			amplitudeBuffer = currentAmplitudeBuffer / _AmplitudeHighest;
 		}
 
 		private void GenerateAudioBands() {
@@ -74,8 +75,8 @@ namespace AudioAnalysis {
 					_frequencyBandHighest[i] = _frequencyBand[i];
 				}
 
-				_audioBand[i] = Mathf.Clamp((_frequencyBand[i] / _frequencyBandHighest[i]), 0, 1);
-				_audioBandBuffer[i] = Mathf.Clamp((_bandBuffer[i] / _frequencyBandHighest[i]), 0, 1);
+				audioBand[i] = Mathf.Clamp((_frequencyBand[i] / _frequencyBandHighest[i]), 0, 1);
+				audioBandBuffer[i] = Mathf.Clamp((_bandBuffer[i] / _frequencyBandHighest[i]), 0, 1);
 			}
 		}
 		
@@ -110,6 +111,7 @@ namespace AudioAnalysis {
 				}
 
 				for (int j = 0; j < sampleCount; j++) {
+					average += (_samples [count] + _samples [count]) * (count + 1);
 					count++;
 
 				}

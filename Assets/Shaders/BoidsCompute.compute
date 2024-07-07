@@ -32,7 +32,11 @@ float LocalArea;
 float RepulsionArea;
 
 float DeltaTime;
+float speedValueMin;
+float speedValueMax;
+bool useAudioBasedSpeed;
 float Speed;
+float amplitudeBuffer;
 int numBoids;
 
 RWStructuredBuffer<Boid> boids;
@@ -134,6 +138,10 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     boidA.forward = lerp(tempSteer, normalize(boidA.forward), steeringCorrection);
 
     //Moving boid
+    if (useAudioBasedSpeed)
+    {
+        Speed = lerp(speedValueMin, speedValueMax, amplitudeBuffer);
+    }
     boidA.position += boidA.forward * (Speed * DeltaTime);
 
     //Updating boid position and rotation

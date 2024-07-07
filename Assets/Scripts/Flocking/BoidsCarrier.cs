@@ -1,21 +1,13 @@
-using System;
-using AudioAnalysis;
 using UnityEngine;
-using UnityEngine.UIElements;
+
 
 namespace Flocking {
     public class BoidsCarrier : FlockingBehaviour {
-
-
-        public AudioData audioData;
         
-        [SerializeField] private bool useScale;
-        [SerializeField] private bool useSpeed;
-        [SerializeField] private Vector2 scaleValueMinMax;
         private BoidConductValues[] _boidValues;
 
-        [Header("Collisions")] [SerializeField]
-        protected LayerMask terrainMask;
+        [Header("Collisions")]
+        [SerializeField] protected LayerMask terrainMask;
 
         [SerializeField] protected float raycastDistance = 100f;
         [SerializeField] protected float collisionAdjustment = 50f;
@@ -36,13 +28,13 @@ namespace Flocking {
 
         // TODO fix this problem 
         private void Start() {
-            var countBand = 0;
-            for (int i = 0; i < boidsArray.Length; i++)
-            {
-                var band = countBand % 8;
-               // boidsArray[i]._audioBand = band;
-                countBand++;
-            }
+            // var countBand = 0;
+            // for (int i = 0; i < boidsArray.Length; i++)
+            // {
+            //     var band = countBand % 8;
+            //    boidsArray[i]._audioBand = band;
+            //     countBand++;
+            // }
         }
 
         private void Update() {
@@ -62,6 +54,8 @@ namespace Flocking {
             boidBuffer.Release();
             jobHandle.Complete();
 
+            
+
             for (int i = 0; i < _boidValues.Length; i++) {
                 var boidTransform = boidsArray[i].transform;
                 var tempPos = boidTransform.position;
@@ -74,18 +68,23 @@ namespace Flocking {
                 boidTransform.rotation = Quaternion.LookRotation(_boidValues[i].forward);
 
 
-                // TODO same problem as above
-                if (useScale) {
-                    //var scale = Mathf.Lerp(scaleValueMinMax.x, scaleValueMinMax.y, audioData._audioBandBuffer[boidsArray[i]])
-                    //boidsArray[i].localScale = new Vector3(scale, scale, scale);
-                }
-                //If boids hit an object, steer out of the way.
-                //Otherwise, raySteer is zero.
+                // // TODO same problem as above
+                // if (useScale) {
+                //     var scale = Mathf.Lerp(scaleValueMinMax.x, scaleValueMinMax.y, audioData._audioBandBuffer[boidsArray[i]])
+                //     boidsArray[i].localScale = new Vector3(scale, scale, scale);
+                // }
+                //
+                // if (useSpeed) {
+                //     speed = Mathf.Lerp(speedValueMinMax.x, speedValueMinMax.y, audioData.amplitudeBuffer);
+                // }
+                
+                
                 
             }
 
             //Schedule raycast commands for next update tick.
             jobHandle = RaycastCommand.ScheduleBatch(rayCommands, rayHits, 1);
+            Debug.Log("Speed >  " + speed);
         }
 
         private void RaycastTypeCheck(Vector3 tempPos, Vector3 tempFwd, int i) {

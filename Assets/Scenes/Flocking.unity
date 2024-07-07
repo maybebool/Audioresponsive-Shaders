@@ -1159,12 +1159,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5664bbbb6557fd74ca1b72f9e5f85419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioBand: []
+  audioBandBuffer: []
+  amplitude: 0
+  amplitudeBuffer: 0
   audioSource: {fileID: 1940616894}
   audioClip: {fileID: 8300000, guid: 2b7f2247fccdeb74c8b0d0063b46ff15, type: 3}
-  _audioBand: []
-  _audioBandBuffer: []
-  _Amplitude: 0
-  _AmplitudeBuffer: 0
 --- !u!82 &1940616894
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1179,7 +1179,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -1415,6 +1415,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
+      propertyPath: useSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: audioData
+      value: 
+      objectReference: {fileID: 1940616893}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
       propertyPath: localArea
       value: 40
       objectReference: {fileID: 0}
@@ -1445,6 +1455,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
+      propertyPath: speedValueMax
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: speedValueMin
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
       propertyPath: noClumpingArea
       value: 5
       objectReference: {fileID: 0}
@@ -1457,6 +1477,26 @@ PrefabInstance:
         type: 3}
       propertyPath: cohesionMultiplier
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: speedValueMinMax.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: speedValueMinMax.y
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: useAudioBasedSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: useDefaultMaterial
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}

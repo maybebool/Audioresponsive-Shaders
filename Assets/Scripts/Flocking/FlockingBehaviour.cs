@@ -1,7 +1,9 @@
+using AudioAnalysis;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 
 namespace Flocking {
     public abstract class FlockingBehaviour : MonoBehaviour {
@@ -20,6 +22,10 @@ namespace Flocking {
         private const string CohesionMultiplier = "cohesionMultiplier";
         private const string LeadershipMultiplier = "leadershipMultiplier";
         private const string TargetPointMultiplier = "targetPointMultiplier";
+        private const string AmplitudeAudioBuffer = "amplitudeBuffer";
+        private const string SpeedValueMin = "speedValueMin";
+        private const string SpeedValueMax = "speedValueMax";
+        private const string UseAudioBasedSpeed = "useAudioBasedSpeed";
         private const string Speed = "Speed";
         private const string SteeringSpeed = "steeringSpeed";
 
@@ -27,6 +33,8 @@ namespace Flocking {
 
 
         #region Variables
+
+        [SerializeField] AudioData audioData;
 
         protected const int threadGroupSize = 128;
         [HideInInspector] [SerializeField] protected Material defaultMat;
@@ -38,15 +46,21 @@ namespace Flocking {
         protected JobHandle jobHandle;
         protected Transform[] boidsArray;
 
-        [Header("Boid Preset")] [SerializeField]
-        protected GameObject boidPrefab;
+        [Header("Boid Preset")] 
+        [SerializeField] protected GameObject boidPrefab;
+        // [SerializeField] private Vector2 scaleValueMinMax;
+        [SerializeField] private bool useScale;
+        [SerializeField] private bool useAudioBasedSpeed;
+        [SerializeField] public float speedValueMin;
+        [SerializeField] public float speedValueMax;
 
         [SerializeField] protected bool useDefaultMaterial = true;
 
         [Header("Spawning")] [SerializeField] protected int spawnBoids = 2048;
         [SerializeField] protected float spawnRange = 50;
 
-        [Header("Movement")] [SerializeField] protected float speed = 20f;
+        [Header("Movement")] 
+        [SerializeField] protected float speed = 20f;
         [SerializeField] protected float steeringSpeed = 2f;
         [SerializeField] protected float localArea = 40f;
         [SerializeField] protected float noClumpingArea = 5f;
@@ -54,16 +68,15 @@ namespace Flocking {
         [SerializeField] protected Transform targetPoint;
         [SerializeField] protected Transform repulsionPoint;
 
-        [Header("Behaviours")] [SerializeField]
-        protected float separationMultiplier = 0.6f;
-
+        [Header("Behaviours")] 
+        [SerializeField] protected float separationMultiplier = 0.6f;
         [SerializeField] protected float alignmentMultiplier = 0.3f;
         [SerializeField] protected float cohesionMultiplier = 0.1f;
         [SerializeField] protected float leadershipMultiplier = 0.01f;
         [SerializeField] protected float targetPointMultiplier = 0.001f;
 
-        [Header("Misc")] [Range(0f, 100f)] [SerializeField]
-        protected float simulationSpeed = 1f;
+        [Header("Misc")] 
+        [Range(0f, 100f)] [SerializeField] protected float simulationSpeed = 1f;
 
         #endregion
 
@@ -135,6 +148,10 @@ namespace Flocking {
             compute.SetVector(TargetPointPos, targetPointPos);
             compute.SetVector(RepulsionPointPos, repulsionPointPos);
             compute.SetFloat(DeltaTime, Time.deltaTime * simulationSpeed);
+            compute.SetFloat(AmplitudeAudioBuffer, audioData.amplitudeBuffer);
+            compute.SetFloat(SpeedValueMin, speedValueMin);
+            compute.SetFloat(SpeedValueMax, speedValueMax);
+            compute.SetFloat(Speed, speed);
         }
 
         /// <summary>
@@ -150,7 +167,7 @@ namespace Flocking {
             compute.SetFloat(CohesionMultiplier, cohesionMultiplier);
             compute.SetFloat(LeadershipMultiplier, leadershipMultiplier);
             compute.SetFloat(TargetPointMultiplier, targetPointMultiplier);
-            compute.SetFloat(Speed, speed);
+            compute.SetBool(UseAudioBasedSpeed, useAudioBasedSpeed);
             compute.SetFloat(SteeringSpeed, steeringSpeed);
         }
 
@@ -191,13 +208,5 @@ namespace Flocking {
                     Random.Range(debugPositions[i].z - spawnRange, debugPositions[i].z + spawnRange));
             }
         }
-
-        // private Material GetDefaultMaterial() {
-        //     return GraphicsSettings.defaultRenderPipeline == null
-        //         ? defaultMat
-        //         : GraphicsSettings.defaultRenderPipeline.default2DMaterial != null
-        //             ? GraphicsSettings.defaultRenderPipeline.default2DMaterial
-        //             : GraphicsSettings.defaultRenderPipeline.defaultMaterial;
-        // }
     }
 }
