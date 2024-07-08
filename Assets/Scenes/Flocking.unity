@@ -1801,7 +1801,7 @@ PrefabInstance:
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: useDefaultMaterial
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
