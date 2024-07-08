@@ -15,6 +15,18 @@ namespace Flocking {
         [SerializeField] protected float collisionAdjustment = 50f;
         [SerializeField] protected RaycastType raycastType = RaycastType.Synchronous;
         [SerializeField] private bool useScale;
+        
+        public Material _material;
+        private Material[] _audioMaterial;
+        public bool _useColor1;
+        public string _colorName1;
+        public Gradient _gradient1;
+        private Color[] _color1;
+        
+        [Range(0f,1f)]
+        public float _colorThreshold1;
+        public float _colorMultiplier1;
+        
 
         protected override int ComputeBufferSize => BoidConductValues.Size;
 
@@ -27,10 +39,16 @@ namespace Flocking {
                 _boidValues[i].forward = boidsArray[i].transform.right;
             }
         }
-
-
-        // TODO fix this problem 
+        
         private void Start() {
+            
+            _audioMaterial = new Material[8];
+            _color1 = new Color[8];
+            for (int i = 0; i < 8; i++)
+            {
+                _color1[i] = _gradient1.Evaluate((1f / 8f) * i);
+                _audioMaterial[i] = new Material(_material);
+            }
             var countBand = 0;
             for (int i = 0; i < boidsArray.Length; i++)
             {
@@ -41,23 +59,23 @@ namespace Flocking {
         }
 
         private void Update() {
-            
+
             ValidateTargetAndRepulsionPoints();
-            
+
             var boidBuffer = new ComputeBuffer(boidsArray.Length, ComputeBufferSize);
             boidBuffer.SetData(_boidValues);
             compute.SetBuffer(0, "boids", boidBuffer);
-            
+
             SetComputeParameters();
-            
+
             var threadGroups = Mathf.CeilToInt(spawnBoids / (float)threadGroupSize);
             compute.Dispatch(0, threadGroups, 1, 1);
-            
+
             boidBuffer.GetData(_boidValues);
             boidBuffer.Release();
             jobHandle.Complete();
 
-            
+
 
             for (int i = 0; i < _boidValues.Length; i++) {
                 var boidTransform = boidsArray[i].transform;
@@ -65,22 +83,34 @@ namespace Flocking {
                 var tempFwd = boidTransform.forward;
 
                 RaycastTypeCheck(tempPos, tempFwd, i);
-                
-                //Boids movement and steering.
+
+
                 boidTransform.position = _boidValues[i].position;
                 boidTransform.rotation = Quaternion.LookRotation(_boidValues[i].forward);
 
-                
+
                 if (useScale) {
-                    var scale = Mathf.Lerp(minMaxValueScale.x, minMaxValueScale.y, audioData.audioBandBuffer[audioBand]);
+                    var scale = Mathf.Lerp(minMaxValueScale.x, minMaxValueScale.y,
+                        audioData.audioBandBuffer[audioBand]);
                     boidsArray[i].localScale = new Vector3(scale, scale, scale);
                 }
-                
             }
+
+            for (int i = 0; i < 8; i++) {
+                if (_useColor1) {
+                    if (audioData.audioBandBuffer[i] > _colorThreshold1) {
+                        _audioMaterial[i].SetColor(_colorName1,
+                            _color1[i] * audioData.audioBandBuffer[i] * _colorMultiplier1);
+                    }
+                    else {
+                        _audioMaterial[i].SetColor(_colorName1, _color1[i] * 0f);
+                    }
+                }
+            }
+
 
             //Schedule raycast commands for next update tick.
             jobHandle = RaycastCommand.ScheduleBatch(rayCommands, rayHits, 1);
-            Debug.Log("Speed >  " + speed);
         }
 
         private void RaycastTypeCheck(Vector3 tempPos, Vector3 tempFwd, int i) {
