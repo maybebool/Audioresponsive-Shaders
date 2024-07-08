@@ -1505,13 +1505,18 @@ PrefabInstance:
       objectReference: {fileID: 286699220}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
+      propertyPath: _colorThreshold1
+      value: 0.118
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
       propertyPath: _colorThreshold2
       value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _colorMultiplier1
-      value: 1
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
@@ -1521,26 +1526,31 @@ PrefabInstance:
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.ctime1
-      value: 15806
+      value: 7903
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.ctime2
-      value: 31418
+      value: 15806
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.ctime3
-      value: 43176
+      value: 31418
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.ctime4
-      value: 58789
+      value: 43176
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.ctime5
+      value: 58789
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: _gradient1.ctime6
       value: 65535
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
@@ -1561,47 +1571,47 @@ PrefabInstance:
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key1.b
-      value: 0.9056604
+      value: 0.94431746
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key1.g
-      value: 0.11925119
+      value: 0.53093326
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key1.r
-      value: 0.08116765
+      value: 0.033653814
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key2.b
-      value: 1
+      value: 0.9056604
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key2.g
-      value: 0.033018887
+      value: 0.11925119
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key2.r
-      value: 0.85656613
+      value: 0.08116765
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key3.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
-        type: 3}
-      propertyPath: _gradient1.key3.g
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
+      propertyPath: _gradient1.key3.g
+      value: 0.033018887
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
       propertyPath: _gradient1.key3.r
-      value: 0.08611512
+      value: 0.85656613
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
@@ -1611,27 +1621,37 @@ PrefabInstance:
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key4.g
-      value: 0.4711905
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key4.r
-      value: 0.8773585
+      value: 0.08611512
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key5.b
-      value: 0.7924528
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key5.g
-      value: 0.7736549
+      value: 0.4711905
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.key5.r
-      value: 0
+      value: 0.8773585
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: _gradient1.key6.b
+      value: 0.7924528
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: _gradient1.key6.g
+      value: 0.7736549
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
@@ -1801,7 +1821,7 @@ PrefabInstance:
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: _gradient1.m_NumColorKeys
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
