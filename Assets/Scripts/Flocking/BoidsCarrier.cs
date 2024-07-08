@@ -96,15 +96,22 @@ namespace Flocking {
                 }
             }
 
-            for (int i = 0; i < 8; i++) {
-                if (_useColor1) {
-                    if (audioData.audioBandBuffer[i] > _colorThreshold1) {
-                        _audioMaterial[i].SetColor(_colorName1,
-                            _color1[i] * audioData.audioBandBuffer[i] * _colorMultiplier1);
-                    }
-                    else {
-                        _audioMaterial[i].SetColor(_colorName1, _color1[i] * 0f);
-                    }
+            // for (int i = 0; i < 8; i++) {
+            //     if (_useColor1) {
+            //         if (audioData.audioBandBuffer[i] > _colorThreshold1) {
+            //             _audioMaterial[i].SetColor(_colorName1,
+            //                 _color1[i] * audioData.audioBandBuffer[i] * _colorMultiplier1);
+            //         }
+            //         else {
+            //             _audioMaterial[i].SetColor(_colorName1, _color1[i] * 0f);
+            //         }
+            //     }
+            // }
+
+            if (_useColor1) {
+                for (int i = 0; i < 8; i++) {
+                    
+                    _audioMaterial[i].SetColor(_colorName1,_color1[i] * Color.black);
                 }
             }
 
