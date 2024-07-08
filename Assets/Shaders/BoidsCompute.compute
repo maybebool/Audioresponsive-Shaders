@@ -32,12 +32,25 @@ float LocalArea;
 float RepulsionArea;
 
 float DeltaTime;
+
 float speedValueMin;
 float speedValueMax;
 bool useAudioBasedSpeed;
 float Speed;
 float amplitudeBuffer;
 int numBoids;
+
+// bool useColorAudio;
+// float color1r;
+// float color1g;
+// float color1b;
+// float color2r;
+// float color2g;
+// float color2b;
+// float computeColorR;
+// float computeColorG;
+// float computeColorB;
+// float colorMultiplier;
 
 RWStructuredBuffer<Boid> boids;
 
@@ -136,6 +149,13 @@ void CSMain(uint3 id : SV_DispatchThreadID)
 
     //Steering boid
     boidA.forward = lerp(tempSteer, normalize(boidA.forward), steeringCorrection);
+
+    // if (useColorAudio)
+    // {
+    //     computeColorR = lerp(color1r,color2r, (amplitudeBuffer + 1) * colorMultiplier);
+    //     computeColorG = lerp(color1g,color2g, (amplitudeBuffer + 1) * colorMultiplier);
+    //     computeColorB = lerp(color1b,color2b, (amplitudeBuffer + 1) * colorMultiplier);
+    // }
 
     //Moving boid
     if (useAudioBasedSpeed)

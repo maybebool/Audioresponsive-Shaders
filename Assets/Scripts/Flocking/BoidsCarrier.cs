@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AudioAnalysis;
 using UnityEngine;
 
@@ -15,12 +16,14 @@ namespace Flocking {
         [SerializeField] protected float collisionAdjustment = 50f;
         [SerializeField] protected RaycastType raycastType = RaycastType.Synchronous;
         [SerializeField] private bool useScale;
+        [SerializeField] private string stringName;
         
         public Material _material;
         private Material[] _audioMaterial;
-        public bool _useColor1;
+        
+        
+        
         public string _colorName1;
-        public Gradient _gradient1;
         private Color[] _color1;
         
         [Range(0f,1f)]
@@ -41,14 +44,14 @@ namespace Flocking {
         }
         
         private void Start() {
-            
-            _audioMaterial = new Material[8];
-            _color1 = new Color[8];
-            for (int i = 0; i < 8; i++)
-            {
-                _color1[i] = _gradient1.Evaluate((1f / 8f) * i);
-                _audioMaterial[i] = new Material(_material);
-            }
+           // _material.SetColor(_colorName1, Color.green);
+            // _audioMaterial = new Material[8];
+            // _color1 = new Color[8];
+            // for (int i = 0; i < 8; i++)
+            // {
+            //     //_color1[i] = _gradient1.((1f / 8f) * i);
+            //     _audioMaterial[i] = new Material(_material);
+            // }
             var countBand = 0;
             for (int i = 0; i < boidsArray.Length; i++)
             {
@@ -75,8 +78,6 @@ namespace Flocking {
             boidBuffer.Release();
             jobHandle.Complete();
 
-
-
             for (int i = 0; i < _boidValues.Length; i++) {
                 var boidTransform = boidsArray[i].transform;
                 var tempPos = boidTransform.position;
@@ -89,33 +90,20 @@ namespace Flocking {
                 boidTransform.rotation = Quaternion.LookRotation(_boidValues[i].forward);
 
 
-                if (useScale) {
-                    var scale = Mathf.Lerp(minMaxValueScale.x, minMaxValueScale.y,
-                        audioData.audioBandBuffer[audioBand]);
-                    boidsArray[i].localScale = new Vector3(scale, scale, scale);
-                }
-            }
-
-            // for (int i = 0; i < 8; i++) {
-            //     if (_useColor1) {
-            //         if (audioData.audioBandBuffer[i] > _colorThreshold1) {
-            //             _audioMaterial[i].SetColor(_colorName1,
-            //                 _color1[i] * audioData.audioBandBuffer[i] * _colorMultiplier1);
-            //         }
-            //         else {
-            //             _audioMaterial[i].SetColor(_colorName1, _color1[i] * 0f);
-            //         }
-            //     }
-            // }
-
-            if (_useColor1) {
-                for (int i = 0; i < 8; i++) {
-                    
-                    _audioMaterial[i].SetColor(_colorName1,_color1[i] * Color.black);
-                }
+                if (!useScale) continue;
+                var scale = Mathf.Lerp(minMaxValueScale.x, minMaxValueScale.y,
+                    audioData.audioBandBuffer[audioBand]);
+                boidsArray[i].localScale = new Vector3(scale, scale, scale);
             }
 
 
+            if (useColorAudio) {
+                if (audioData.amplitudeBuffer > _colorThreshold1) {
+                    _material.color = Color.Lerp(color1, color2, audioData.amplitudeBuffer * colorMultiplier);
+                }
+            }
+
+            
             //Schedule raycast commands for next update tick.
             jobHandle = RaycastCommand.ScheduleBatch(rayCommands, rayHits, 1);
         }

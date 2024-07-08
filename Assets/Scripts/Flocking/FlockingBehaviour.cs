@@ -26,6 +26,17 @@ namespace Flocking {
         private const string SpeedValueMin = "speedValueMin";
         private const string SpeedValueMax = "speedValueMax";
         private const string UseAudioBasedSpeed = "useAudioBasedSpeed";
+        private const string UseColorAudio = "useColorAudio";
+        // private const string Color1r = "color1r";
+        // private const string Color1g = "color1g";
+        // private const string Color1b = "color1b";
+        // private const string Color2r = "color2r";
+        // private const string Color2g = "color2g";
+        // private const string Color2b = "color2b";
+        // private const string ComputeColorR = "computeColorR";
+        // private const string ComputeColorG = "computeColorG";
+        // private const string ComputeColorB = "computeColorB";
+        private const string ColorMultiplier = "colorMultiplier";
         private const string Speed = "Speed";
         private const string SteeringSpeed = "steeringSpeed";
 
@@ -36,6 +47,12 @@ namespace Flocking {
 
         [SerializeField] public AudioData audioData;
         [HideInInspector] public int audioBand;
+        [SerializeField] public bool useColorAudio;
+        [SerializeField] protected float colorMultiplier;
+        [SerializeField] protected float colorMultiplier2;
+        //[HideInInspector] public float color1r,color1g,color1b, color2r,color2g, color2b,computeColorR,computeColorG,computeColorB;
+        [SerializeField] protected Color color1;
+        [SerializeField] protected Color color2;
 
         protected const int threadGroupSize = 128;
         [HideInInspector] [SerializeField] protected Material defaultMat;
@@ -152,6 +169,16 @@ namespace Flocking {
             compute.SetFloat(SpeedValueMin, speedValueMin);
             compute.SetFloat(SpeedValueMax, speedValueMax);
             compute.SetFloat(Speed, speed);
+            compute.SetFloat(ColorMultiplier, colorMultiplier);
+            // compute.SetFloat(Color1r,color1r);
+            // compute.SetFloat(Color1g,color1g);
+            // compute.SetFloat(Color1b,color1b);
+            // compute.SetFloat(Color2r,color2r);
+            // compute.SetFloat(Color2g,color2g);
+            // compute.SetFloat(Color2b,color2b);
+            // compute.SetFloat(ComputeColorR, computeColorR);
+            // compute.SetFloat(ComputeColorG, computeColorG);
+            // compute.SetFloat(ComputeColorB, computeColorB);
         }
 
         /// <summary>
@@ -168,6 +195,7 @@ namespace Flocking {
             compute.SetFloat(LeadershipMultiplier, leadershipMultiplier);
             compute.SetFloat(TargetPointMultiplier, targetPointMultiplier);
             compute.SetBool(UseAudioBasedSpeed, useAudioBasedSpeed);
+            compute.SetBool(UseColorAudio, useColorAudio);
             compute.SetFloat(SteeringSpeed, steeringSpeed);
         }
 
