@@ -1415,6 +1415,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
+      propertyPath: useScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
       propertyPath: useSpeed
       value: 1
       objectReference: {fileID: 0}
@@ -1477,6 +1482,16 @@ PrefabInstance:
         type: 3}
       propertyPath: cohesionMultiplier
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: minMaxValueScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: minMaxValueScale.y
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}

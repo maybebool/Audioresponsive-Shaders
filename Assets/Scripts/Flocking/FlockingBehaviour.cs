@@ -34,7 +34,8 @@ namespace Flocking {
 
         #region Variables
 
-        [SerializeField] AudioData audioData;
+        [SerializeField] public AudioData audioData;
+        [HideInInspector] public int audioBand;
 
         protected const int threadGroupSize = 128;
         [HideInInspector] [SerializeField] protected Material defaultMat;
@@ -49,7 +50,7 @@ namespace Flocking {
         [Header("Boid Preset")] 
         [SerializeField] protected GameObject boidPrefab;
         // [SerializeField] private Vector2 scaleValueMinMax;
-        [SerializeField] private bool useScale;
+        //[SerializeField] private bool useScale;
         [SerializeField] private bool useAudioBasedSpeed;
         [SerializeField] public float speedValueMin;
         [SerializeField] public float speedValueMax;
@@ -120,7 +121,6 @@ namespace Flocking {
         }
 
         protected void OnValidate() {
-            //Set all buffers that need to be updated on validation of variables in the Inspector.
             InitialiseBuffer();
         }
 

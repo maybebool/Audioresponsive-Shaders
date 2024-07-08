@@ -1,3 +1,4 @@
+using AudioAnalysis;
 using UnityEngine;
 
 
@@ -5,13 +6,15 @@ namespace Flocking {
     public class BoidsCarrier : FlockingBehaviour {
         
         private BoidConductValues[] _boidValues;
+        //public AudioData audioData;
 
         [Header("Collisions")]
         [SerializeField] protected LayerMask terrainMask;
-
+        [SerializeField] private Vector2 minMaxValueScale;
         [SerializeField] protected float raycastDistance = 100f;
         [SerializeField] protected float collisionAdjustment = 50f;
         [SerializeField] protected RaycastType raycastType = RaycastType.Synchronous;
+        [SerializeField] private bool useScale;
 
         protected override int ComputeBufferSize => BoidConductValues.Size;
 
@@ -28,13 +31,13 @@ namespace Flocking {
 
         // TODO fix this problem 
         private void Start() {
-            // var countBand = 0;
-            // for (int i = 0; i < boidsArray.Length; i++)
-            // {
-            //     var band = countBand % 8;
-            //    boidsArray[i]._audioBand = band;
-            //     countBand++;
-            // }
+            var countBand = 0;
+            for (int i = 0; i < boidsArray.Length; i++)
+            {
+                var band = countBand % 8;
+               audioBand = band;
+                countBand++;
+            }
         }
 
         private void Update() {
@@ -67,18 +70,11 @@ namespace Flocking {
                 boidTransform.position = _boidValues[i].position;
                 boidTransform.rotation = Quaternion.LookRotation(_boidValues[i].forward);
 
-
-                // // TODO same problem as above
-                // if (useScale) {
-                //     var scale = Mathf.Lerp(scaleValueMinMax.x, scaleValueMinMax.y, audioData._audioBandBuffer[boidsArray[i]])
-                //     boidsArray[i].localScale = new Vector3(scale, scale, scale);
-                // }
-                //
-                // if (useSpeed) {
-                //     speed = Mathf.Lerp(speedValueMinMax.x, speedValueMinMax.y, audioData.amplitudeBuffer);
-                // }
                 
-                
+                if (useScale) {
+                    var scale = Mathf.Lerp(minMaxValueScale.x, minMaxValueScale.y, audioData.audioBandBuffer[audioBand]);
+                    boidsArray[i].localScale = new Vector3(scale, scale, scale);
+                }
                 
             }
 
