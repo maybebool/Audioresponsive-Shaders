@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CCA.unity
     guid: 5023197842fcae84fa53bf3fdef4c515
+  - enabled: 1
+    path: Assets/Scenes/AgentCCA.unity
+    guid: 70ba640523777c8438ba9b41360e776f
   m_configObjects: {}
