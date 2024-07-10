@@ -3,7 +3,8 @@
     public enum Scene {
         MainMenu,
         Flocking,
-        AgentCCA
+        AgentCCA,
+        Noise
         
     }
 }

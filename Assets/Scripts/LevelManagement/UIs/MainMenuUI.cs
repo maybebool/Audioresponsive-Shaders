@@ -26,7 +26,7 @@ namespace LevelManagement.UIs {
         }
         
         private void OnCCALevelButtonClicked() {
-            ScenesManager.Instance.LoadScene(Scene.AgentCCA);
+            ScenesManager.Instance.LoadScene(Scene.Noise);
         }
         
         private void OnApplicationQuit() {

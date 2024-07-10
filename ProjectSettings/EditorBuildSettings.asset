@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AgentCCA.unity
     guid: 70ba640523777c8438ba9b41360e776f
+  - enabled: 1
+    path: Assets/Scenes/Noise.unity
+    guid: 411a76e6a940a484d9f73f5df91c6ffa
   m_configObjects: {}
