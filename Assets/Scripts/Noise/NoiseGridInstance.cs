@@ -11,7 +11,7 @@ namespace Noise {
         public Mesh iMesh; // the mesh to instance
     
         protected ComputeBuffer _bufferArgumentsData; // instance info to pass to the shader
-
+        protected int audioBand;
         protected Bounds _bounds;
     
         void Start()
@@ -32,6 +32,14 @@ namespace Noise {
             // Pass texture to shader graph
             outMat.SetTexture("_inTex", inTex);
             outMat.SetFloat("_Rez", rez);
+            
+            var countBand = 0;
+            for (int i = 0; i < 8; i++)
+            {
+                var band = countBand % 8;
+                audioBand = band;
+                countBand++;
+            }
 
         }
 

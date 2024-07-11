@@ -167,7 +167,7 @@ Material:
     - _AlphaSrcBlend: 1
     - _AlphaToMask: 0
     - _AlphaToMaskInspectorValue: 0
-    - _Amplitude: 10.11
+    - _Amplitude: 20
     - _Anisotropy: 0
     - _BlendMode: 0
     - _CoatMask: 0

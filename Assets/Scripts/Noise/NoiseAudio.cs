@@ -53,11 +53,19 @@ namespace Noise {
             // //audioCalcCompShader.SetFloat(SaturationValue, useSaturation ? audioMatValues.GetFloat(SaturationValue) : 0);
             // audioCalcCompShader.SetVector(MinMaxSaturation, _minMaxSaturation);
             if (useSaturation) {
-                if (audioData.amplitudeBuffer < threshold) {
+                if (audioData.amplitudeBuffer > threshold) {
                     var lerpSaturationValue = Mathf.Lerp(_minMaxSaturation.x, _minMaxSaturation.y, audioData.amplitudeBuffer);
                     audioMatValues.SetFloat(SaturationValue, lerpSaturationValue);
                 }
             }
+
+            // for (int i = 0; i < 8; i++) {
+            //     if (useSaturation) {
+            //             var lerpSaturationValue = Mathf.Lerp(_minMaxSaturation.x, _minMaxSaturation.y, audioData.audioBandBuffer[audioBand]);
+            //             audioMatValues.SetFloat(SaturationValue, lerpSaturationValue);
+            //         
+            //     }
+            // }
 
             // audioMatValues.SetFloat(SaturationValue, computeLerpSaturationValue);
             // if (useHueFloating) {

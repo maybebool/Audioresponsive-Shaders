@@ -974,7 +974,7 @@ MonoBehaviour:
   amplitude: 0
   amplitudeBuffer: 0
   audioSource: {fileID: 860698050}
-  audioClip: {fileID: 8300000, guid: 2b7f2247fccdeb74c8b0d0063b46ff15, type: 3}
+  audioClip: {fileID: 8300000, guid: c438552938d8b43448999f4da579f3f3, type: 3}
 --- !u!82 &860698050
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1292,7 +1292,7 @@ MonoBehaviour:
   useCellAmount: 0
   audioCalcCompShader: {fileID: 7200000, guid: 7d6cadc0f4f864645966e1a7a2e94cbc, type: 3}
   _minMaxSaturation: {x: 0, y: 2}
-  threshold: 1.5
+  threshold: 0
   thresholdHue: 0.95
   thresholdCells: 1
   computeLerpSaturationValue: 0
