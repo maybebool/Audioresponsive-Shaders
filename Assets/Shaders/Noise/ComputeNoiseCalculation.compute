@@ -1,0 +1,16 @@
+
+#pragma kernel CSMain
+
+float _SaturationValue;
+bool useSaturation;
+float amplitudeBuffer;
+float2 _minMaxSaturation;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    if (useSaturation)
+    {
+        _SaturationValue = lerp(_minMaxSaturation.x, _minMaxSaturation.y, amplitudeBuffer);
+    }
+}
