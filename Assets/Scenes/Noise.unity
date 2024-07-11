@@ -1290,8 +1290,10 @@ MonoBehaviour:
   useSaturation: 1
   useHueFloating: 1
   useCellAmount: 0
+  useAmplitude: 1
   audioCalcCompShader: {fileID: 7200000, guid: 7d6cadc0f4f864645966e1a7a2e94cbc, type: 3}
   _minMaxSaturation: {x: 0, y: 2}
+  _minMaxAmplitude: {x: 5, y: 20}
   threshold: 0
   thresholdHue: 0.95
   thresholdCells: 1

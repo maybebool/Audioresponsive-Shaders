@@ -9,6 +9,7 @@ namespace Noise {
         #region strings
 
         private const string SaturationValue = "_SaturationValue";
+        private const string AmplitudeValue = "_Amplitude";
         private const string ComputeLerpSaturationValue = "computeLerpSaturationValue";
         private const string HueSpeed = "_Hue_Speed";
         private const string CellAmount = "_CellAmount";
@@ -20,11 +21,14 @@ namespace Noise {
 
         [SerializeField] private AudioData audioData;
         [SerializeField] private Material audioMatValues;
+        //[SerializeField] private Material audioMatValues2;
         [SerializeField] public bool useSaturation;
         [SerializeField] private bool useHueFloating;
         [SerializeField] private bool useCellAmount;
+        [SerializeField] private bool useAmplitude;
         public ComputeShader audioCalcCompShader;
         public Vector2 _minMaxSaturation;
+        public Vector2 _minMaxAmplitude;
         private float saturationValue;
         public float threshold = 1.0f;
         public float thresholdHue = 1.0f;
@@ -56,6 +60,12 @@ namespace Noise {
                 if (audioData.amplitudeBuffer > threshold) {
                     var lerpSaturationValue = Mathf.Lerp(_minMaxSaturation.x, _minMaxSaturation.y, audioData.amplitudeBuffer);
                     audioMatValues.SetFloat(SaturationValue, lerpSaturationValue);
+                }
+            }
+            if (useAmplitude) {
+                if (audioData.amplitudeBuffer > threshold) {
+                    var lerpAmplitudeValue = Mathf.Lerp(_minMaxAmplitude.x, _minMaxAmplitude.y, audioData.amplitudeBuffer);
+                    outMat.SetFloat(AmplitudeValue, lerpAmplitudeValue);
                 }
             }
 

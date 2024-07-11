@@ -52,7 +52,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Layer_7947E01B:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 50e33b53b9f26ea48982eac3a585f40e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _AnisotropyMap:
@@ -167,7 +167,7 @@ Material:
     - _AlphaSrcBlend: 1
     - _AlphaToMask: 0
     - _AlphaToMaskInspectorValue: 0
-    - _Amplitude: 20
+    - _Amplitude: 7.997297
     - _Anisotropy: 0
     - _BlendMode: 0
     - _CoatMask: 0
