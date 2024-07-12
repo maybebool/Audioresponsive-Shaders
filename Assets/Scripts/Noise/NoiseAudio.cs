@@ -77,18 +77,6 @@ namespace Noise {
             //     }
             // }
 
-            // audioMatValues.SetFloat(SaturationValue, computeLerpSaturationValue);
-            // if (useHueFloating) {
-            //     if (audioData.amplitudeBuffer < thresholdHue) {
-            //         var lerpHueValue = Mathf.Lerp(90, 91, audioData.amplitudeBuffer);
-            //         audioMatValues.SetFloat(HueSpeed, lerpHueValue);  
-            //     }
-            //     else {
-            //         audioMatValues.SetFloat(HueSpeed, 88);  
-            //     }
-            // }
-            
-            // Debug.Log(audioData.amplitudeBuffer);
             if (useCellAmount) {
                 if (audioData.amplitudeBuffer < thresholdCells) {
                     var lerpCells = Mathf.Lerp(5, 6, audioData.amplitudeBuffer);
