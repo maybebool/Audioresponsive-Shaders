@@ -1288,7 +1288,7 @@ MonoBehaviour:
   audioData: {fileID: 860698049}
   audioMatValues: {fileID: 2100000, guid: a3b54ab697dd457419ca92b25a1f66f6, type: 2}
   useSaturation: 1
-  useHueFloating: 1
+  useHueFloating: 0
   useCellAmount: 0
   useAmplitude: 1
   audioCalcCompShader: {fileID: 7200000, guid: 7d6cadc0f4f864645966e1a7a2e94cbc, type: 3}
