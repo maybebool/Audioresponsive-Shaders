@@ -48,7 +48,7 @@ Shader "Unlit/TimeWaveTexture"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                return fixed4(1, i.uv.x + 0.1,i.uv.x + 0.5,1);
+                return fixed4(0, i.uv.x - 0.5 ,i.uv.x - 0.2 , 1);
             }
             ENDCG
         }
