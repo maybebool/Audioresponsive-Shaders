@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using AudioAnalysis;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 
 namespace Flocking {
@@ -12,6 +13,7 @@ namespace Flocking {
         [Header("Collisions")]
         [SerializeField] protected LayerMask terrainMask;
         [SerializeField] private Vector2 minMaxValueScale;
+        [SerializeField] private Vector2 minMaxValueSmothness;
         [SerializeField] protected float raycastDistance = 100f;
         [SerializeField] protected float collisionAdjustment = 50f;
         [SerializeField] protected RaycastType raycastType = RaycastType.Synchronous;
@@ -26,8 +28,7 @@ namespace Flocking {
         public string _colorName1;
         private Color[] _color1;
         
-        [Range(0f,1f)]
-        public float _colorThreshold1;
+        [Range(0f,1f)] public float smoothnessThreshold;
         public float _colorMultiplier1;
         
 
@@ -98,9 +99,14 @@ namespace Flocking {
 
 
             if (useColorAudio) {
-                if (audioData.amplitudeBuffer > _colorThreshold1) {
-                    _material.color = Color.Lerp(color1, color2, audioData.amplitudeBuffer * colorMultiplier);
+                if (audioData.amplitudeBuffer > smoothnessThreshold) {
+                    var lerpValue = Mathf.Lerp(minMaxValueSmothness.x, minMaxValueSmothness.y,
+                        audioData.amplitudeBuffer);
+                    _material.SetFloat(Smoothness, 1 - lerpValue);
                 }
+            }
+            else {
+                _material.SetFloat(Smoothness,0);
             }
 
             

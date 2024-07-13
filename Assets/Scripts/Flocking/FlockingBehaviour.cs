@@ -27,6 +27,7 @@ namespace Flocking {
         private const string SpeedValueMax = "speedValueMax";
         private const string UseAudioBasedSpeed = "useAudioBasedSpeed";
         private const string UseColorAudio = "useColorAudio";
+        protected const string Smoothness = "_Smoothness";
         // private const string Color1r = "color1r";
         // private const string Color1g = "color1g";
         // private const string Color1b = "color1b";

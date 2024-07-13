@@ -1,8 +1,6 @@
-using System;
 using AudioAnalysis;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
-using UnityEngine.Serialization;
+
 
 namespace Noise {
     public class NoiseAudio : NoiseGridInstance {
