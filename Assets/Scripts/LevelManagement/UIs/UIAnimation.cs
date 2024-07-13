@@ -1,7 +1,7 @@
 using UnityEngine;
 
 namespace LevelManagement.UIs {
-    public class ButtonAnimation : MonoBehaviour
+    public class UIAnimation : MonoBehaviour
     {
         [SerializeField] private float amplitude;
         [SerializeField] [Range(0.5f, 20f)] private float frequency;
