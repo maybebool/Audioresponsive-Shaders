@@ -24,9 +24,9 @@ float speedValueMax;
 bool useAudioBasedSpeed;
 float speed;
 float amplitudeBuffer;
-int numBoids;
 
 // Boid values
+int numBoids;
 float noCompressionArea;
 float localArea;
 float repulsionArea;
@@ -38,10 +38,8 @@ float cohesionFactor;
 float leadershipWeight;
 float centerWeight;
 
-
+// time value
 float deltaTime;
-
-
 
 RWStructuredBuffer<Boid> boid_bodies;
 

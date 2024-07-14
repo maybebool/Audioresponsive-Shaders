@@ -2,15 +2,14 @@ using AudioAnalysis;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Serialization;
 
 namespace Flocking {
     public abstract class FlockingBehaviour : MonoBehaviour {
+        
         // avoiding hard code errors
         #region Constants for Declarations
 
-        protected const int threadGroupSize = 128;
+        protected const int ThreadGroupSize = 128;
         protected const string Smoothness = "_Smoothness";
         protected const string BoidBodies = "boid_bodies";
         
@@ -39,44 +38,41 @@ namespace Flocking {
         private const string DeltaTime = "deltaTime";
 
         #endregion
-
-
+        
         #region Variables
 
         [Header("Audio reactive Settings")]
         [Space]
+        
         [SerializeField] public bool useMaterialSmoothness;
         [SerializeField] protected Vector2 minMaxValueSmoothness;
         [Range(0f,1f)] [SerializeField] protected float smoothnessThreshold;
         [SerializeField] protected Material material;
+        
         [Space]
-        [SerializeField] private bool useAudioBasedSpeed;
-        [SerializeField] public float speedValueMin;
-        [SerializeField] public float speedValueMax;
+        [SerializeField] public bool useAudioBasedSpeed;
+        [SerializeField] protected float speedValueMin;
+        [SerializeField] protected float speedValueMax;
+        
         [Space]
-        [SerializeField] protected bool useScale;
+        [SerializeField] public bool useScale;
         [SerializeField] protected Vector2 minMaxValueScale;
+        
         [Space]
-        [SerializeField] public AudioData audioData;
+        [SerializeField] protected AudioData audioData;
         
-        
-        private Vector3 targetPointPos;
-        private Vector3 repulsionPointPos;
-        protected NativeArray<RaycastCommand> rayCommands;
-        protected NativeArray<RaycastHit> rayHits;
-        protected JobHandle jobHandle;
-        protected Transform[] boidsArray;
-
         [Header("Boid Settings")]
         [SerializeField] protected GameObject boidPrefab;
         [SerializeField] protected int amountOfBoids = 500;
         [SerializeField] protected float spawningField = 200;
+        
         [Space]
         [SerializeField] protected float speed = 10f;
         [SerializeField] protected float steeringSpeed = 2f;
         [SerializeField] protected float separationFactor = 0.6f;
         [SerializeField] protected float alignmentFactor = 0.3f;
         [SerializeField] protected float cohesionFactor = 0.1f;
+        
         [Space]
         [SerializeField] protected float localArea = 40f;
         [SerializeField] protected float noCompressionArea = 5f;
@@ -85,10 +81,20 @@ namespace Flocking {
         [SerializeField] protected Transform repulsionPoint;
         [SerializeField] protected float leadershipWeight = 0.01f;
         [SerializeField] protected float centerWeight = 0.0001f;
-
-        [HideInInspector] [SerializeField] protected ComputeShader compute;
-        [HideInInspector] public int audioBand;
         
+        [Header("Boid Collision Behaviour")]
+        [SerializeField] protected LayerMask terrainMask;
+        [SerializeField] protected RaycastType raycastType = RaycastType.Synchronous;
+        [SerializeField] protected float collisionAdjustment = 50f;
+        [SerializeField] protected float raycastDistance = 100f;
+
+        protected int audioBand;
+        protected Transform[] boidsArray;
+        [HideInInspector] [SerializeField] protected ComputeShader compute;
+        
+        private Vector3 _targetPointPos;
+        private Vector3 _repulsionPointPos;
+        private NativeArray<RaycastHit> _rayHits;
 
         #endregion
 
@@ -97,34 +103,18 @@ namespace Flocking {
             Asynchronous,
             None
         }
-
-        //Gizmos Stuff
-        protected float lastSpawnRange;
-        protected Vector3[] debugPositions = new Vector3[0];
-
-        /// <summary>
-        /// Abstract property. Gets the size which our compute buffer needs to be to support supplied data
-        /// </summary>
-        protected abstract int ComputeBufferSize { get; }
-
+        
         protected abstract void InitializeBoidData();
 
         protected virtual void Awake() {
-
-            //Boids initialisaton, adds all boids to an array.
             boidsArray = new Transform[amountOfBoids];
-            rayCommands = new NativeArray<RaycastCommand>(boidsArray.Length, Allocator.Persistent);
-            rayHits = new NativeArray<RaycastHit>(boidsArray.Length, Allocator.Persistent);
-
-            //Initialises boids buffer to send to compute shader
+            _rayHits = new NativeArray<RaycastHit>(boidsArray.Length, Allocator.Persistent);
             InitialiseBuffer();
-
-            //Spawns all boids
+            
             for (int i = 0; i < boidsArray.Length; i++) {
                 SpawnBoid(i);
             }
-
-            // Call InitializeBoidData overrides in inheriting classes
+            
             InitializeBoidData();
         }
 
@@ -133,39 +123,30 @@ namespace Flocking {
         }
 
         protected virtual void OnDestroy() {
-            //Garbage collection.
-            jobHandle.Complete();
-            rayCommands.Dispose();
-            rayHits.Dispose();
+            _rayHits.Dispose();
         }
 
-        /// <summary>
-        /// Call to validate target and repulsion points
-        /// </summary>
-        protected void ValidateTargetAndRepulsionPoints() {
-            if (targetPoint == null) targetPointPos = transform.position;
-            else targetPointPos = targetPoint.position;
-            if (repulsionPoint == null) repulsionPointPos = transform.position;
-            else repulsionPointPos = repulsionPoint.position;
+        
+        
+        protected void CheckForTargetAndRepulsionPointBehaviour() {
+            _targetPointPos = targetPoint == null ? transform.position : targetPoint.position;
+            _repulsionPointPos = repulsionPoint == null ? transform.position : repulsionPoint.position;
         }
 
-        /// <summary>
-        /// Sets compute parameters which need to be set every Update() call
-        /// </summary>
+        
         protected void SetComputeParameters() {
-            compute.SetVector(TargetPointPos, targetPointPos);
-            compute.SetVector(RepulsionPointPos, repulsionPointPos);
+            compute.SetVector(TargetPointPos, _targetPointPos);
+            compute.SetVector(RepulsionPointPos, _repulsionPointPos);
             compute.SetFloat(DeltaTime, Time.deltaTime * 3);
             compute.SetFloat(AmplitudeAudioBuffer, audioData.amplitudeBuffer);
             compute.SetFloat(SpeedValueMin, speedValueMin);
             compute.SetFloat(SpeedValueMax, speedValueMax);
             compute.SetFloat(Speed, speed);
+            compute.SetBool(UseAudioBasedSpeed, useAudioBasedSpeed);
         }
 
-        /// <summary>
-        /// Sets initial compute parameters which only need to be set on initialize
-        /// </summary>
-        protected virtual void InitialiseBuffer() {
+
+        private void InitialiseBuffer() {
             compute.SetInt(NumBoids, amountOfBoids);
             compute.SetFloat(LocalArea, localArea);
             compute.SetFloat(NoCompressionArea, noCompressionArea);
@@ -175,46 +156,15 @@ namespace Flocking {
             compute.SetFloat(CohesionFactor, cohesionFactor);
             compute.SetFloat(LeadershipWeight, leadershipWeight);
             compute.SetFloat(CenterWeight, centerWeight);
-            compute.SetBool(UseAudioBasedSpeed, useAudioBasedSpeed);
             compute.SetFloat(SteeringSpeed, steeringSpeed);
         }
 
-        protected void SpawnBoid(int index) {
+        private void SpawnBoid(int index) {
             var boidInstance = Instantiate(boidPrefab, transform);
             boidInstance.transform.localPosition = new Vector3(Random.Range(-spawningField, spawningField),
                 Random.Range(-spawningField, spawningField), Random.Range(-spawningField, spawningField));
 
             boidsArray[index] = boidInstance.transform;
-        }
-
-        protected virtual void OnDrawGizmosSelected() {
-            Gizmos.color = new Color(1, 0, 0, 0.5f);
-            Gizmos.DrawWireCube(transform.position, new Vector3(spawningField * 2, spawningField * 2, spawningField * 2));
-
-            if (debugPositions.Length == amountOfBoids) {
-                for (int i = 0; i < amountOfBoids; i++) {
-                    Gizmos.DrawWireSphere
-                    (
-                        new Vector3(transform.position.x + debugPositions[i].x,
-                            transform.position.y + debugPositions[i].y, transform.position.z + debugPositions[i].z),
-                        0.5f
-                    );
-                }
-            }
-
-            if (amountOfBoids == 0) return;
-            var regeneratePositions = debugPositions.Length != amountOfBoids || lastSpawnRange != spawningField;
-            if (!regeneratePositions && debugPositions[0].x != 0 && debugPositions[0].y != 0 &&
-                debugPositions[0].z != 0) return;
-
-            debugPositions = new Vector3[amountOfBoids];
-            lastSpawnRange = spawningField;
-            for (int i = 0; i < amountOfBoids; i++) {
-                debugPositions[i] = new Vector3(
-                    Random.Range(debugPositions[i].x - spawningField, debugPositions[i].x + spawningField),
-                    Random.Range(debugPositions[i].y - spawningField, debugPositions[i].y + spawningField),
-                    Random.Range(debugPositions[i].z - spawningField, debugPositions[i].z + spawningField));
-            }
         }
     }
 }
