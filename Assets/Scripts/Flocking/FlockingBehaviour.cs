@@ -126,14 +126,19 @@ namespace Flocking {
             _rayHits.Dispose();
         }
 
-        
-        
+
+        /// <summary>
+        /// Checks for the target and repulsion point positions and updates private variables accordingly.
+        /// </summary
         protected void CheckForTargetAndRepulsionPointBehaviour() {
             _targetPointPos = targetPoint == null ? transform.position : targetPoint.position;
             _repulsionPointPos = repulsionPoint == null ? transform.position : repulsionPoint.position;
         }
 
-        
+
+        /// <summary>
+        /// Sets the compute shader parameters for the flocking behaviour, for every Update.
+        /// </summary>
         protected void SetComputeParameters() {
             compute.SetVector(TargetPointPos, _targetPointPos);
             compute.SetVector(RepulsionPointPos, _repulsionPointPos);
@@ -146,6 +151,9 @@ namespace Flocking {
         }
 
 
+        /// <summary>
+        /// Initializes the compute shader buffer and sets the required compute shader parameters.
+        /// </summary>
         private void InitialiseBuffer() {
             compute.SetInt(NumBoids, amountOfBoids);
             compute.SetFloat(LocalArea, localArea);
@@ -159,6 +167,10 @@ namespace Flocking {
             compute.SetFloat(SteeringSpeed, steeringSpeed);
         }
 
+        /// <summary>
+        /// Spawns a boid at a randomized position within the spawning field and adds it to the boidsArray.
+        /// </summary>
+        /// <param name="index">The index of the boid being spawned.</param>
         private void SpawnBoid(int index) {
             var boidInstance = Instantiate(boidPrefab, transform);
             boidInstance.transform.localPosition = new Vector3(Random.Range(-spawningField, spawningField),

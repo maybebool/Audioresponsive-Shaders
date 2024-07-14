@@ -33,7 +33,6 @@ Shader "Unlit/TimeWaveTexture"
 
             v2f vert (appdata v)
             {
-                
                 v2f o;
                 o.uv = v.uv;
                 float xMod = tex2Dlod(_MainTex, float4(o.uv.xy, 0, 1));

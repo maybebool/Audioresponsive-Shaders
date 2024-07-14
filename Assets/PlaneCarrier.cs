@@ -4,12 +4,11 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter))]
 public class PlaneCarrier : MonoBehaviour
 {
-    public float width = 1;
-    public float length = 1;
-
-    // Plane resolution
-    public int widthResolution = 10;
-    public int lengthResolution = 10;
+    [SerializeField] private float width = 1;
+    [SerializeField] private float length = 1;
+    
+    [SerializeField] private int widthResolution = 10;
+    [SerializeField] private int lengthResolution = 10;
 
     private void Start() {
         var mesh = new Mesh();

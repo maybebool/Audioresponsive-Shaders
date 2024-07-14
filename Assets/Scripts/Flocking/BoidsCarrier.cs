@@ -37,6 +37,10 @@ namespace Flocking {
             CheckForAudioReactiveSmoothness();
         }
 
+
+        /// <summary>
+        /// Sets the compute buffer data for the boids, and dispatches the compute shader to perform the calculations.
+        /// </summary>
         private void HandleComputeBufferData() {
             var boidBuffer = new ComputeBuffer(boidsArray.Length, BufferSizeCalc);
             boidBuffer.SetData(_boidValues);
@@ -51,6 +55,14 @@ namespace Flocking {
             boidBuffer.Release();
         }
 
+        /// <summary>
+        /// Checks for audio reactive smoothness and updates the material's smoothness property based on the audio amplitude buffer.
+        /// </summary>
+        /// <remarks>
+        /// If the <see cref="useMaterialSmoothness"/> flag is set to true and the audio amplitude buffer is greater than the <see cref="smoothnessThreshold"/>,
+        /// the material's smoothness property is updated using the <see cref="Mathf.Lerp"/> function with the <see cref="minMaxValueSmoothness"/> values.
+        /// If the <see cref="useMaterialSmoothness"/> flag is set to false, the material's smoothness property is set to 0.
+        /// </remarks>
         private void CheckForAudioReactiveSmoothness() {
             if (useMaterialSmoothness) {
                 if (audioData.amplitudeBuffer > smoothnessThreshold) {
@@ -64,6 +76,9 @@ namespace Flocking {
             }
         }
 
+        /// <summary>
+        /// Checks for boid transform behaviour and updates the positions, rotations, and scales of the boids. Scale is audio reactive.
+        /// </summary>
         private void CheckForBoidsTransfromBehaviour() {
             for (int i = 0; i < _boidValues.Length; i++) {
                 var boidTransform = boidsArray[i].transform;
@@ -82,12 +97,19 @@ namespace Flocking {
             }
         }
 
-        private void RaycastTypeCheck(Vector3 tempPos, Vector3 tempFwd, int i) {
+        /// <summary>
+        /// Checks for raycast type and performs a raycast to determine if a collision with terrain occurs.
+        /// Updates the boid conduct values based on the result of the raycast.
+        /// </summary>
+        /// <param name="tempPos">The temporary position of the boid.</param>
+        /// <param name="tempForward">The temporary forward direction of the boid.</param>
+        /// <param name="i">The index of the boid in the array.</param>
+        private void RaycastTypeCheck(Vector3 tempPos, Vector3 tempForward, int i) {
             var didHit = false;
             RaycastHit raycastHit = default;
             switch (raycastType) {
                 case RaycastType.Synchronous:
-                    Physics.Raycast(tempPos, tempFwd, out raycastHit, raycastDistance, terrainMask);
+                    Physics.Raycast(tempPos, tempForward, out raycastHit, raycastDistance, terrainMask);
                     didHit = raycastHit.collider != null;
                     break;
                 case RaycastType.None:
