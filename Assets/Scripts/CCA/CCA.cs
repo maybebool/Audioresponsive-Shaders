@@ -1,11 +1,11 @@
 using UnityEngine;
 
 public class CCA : MonoBehaviour {
+    
     #region Constants
 
     private const string StepKernel = "StepKernel";
     private const string ResetKernel = "ResetKernel";
-    private const string SecondaryNoiseKernel = "SecondaryNoiseKernel";
     private const string BaseMap = "_BaseMap";
     private const string WriteTex = "writeTex";
     private const string ReadTex = "readTex";
@@ -23,6 +23,7 @@ public class CCA : MonoBehaviour {
     #endregion
 
     [Header("CCA Params")]
+    
     [Range(1, MAX_RANGE)] [SerializeField] private int range = 2;
     [Range(0, MAX_THRESHOLD)] [SerializeField] private int threshold = 8;
     [Range(1, MAX_STATES)] [SerializeField] private int nStates = 4;
@@ -66,13 +67,13 @@ public class CCA : MonoBehaviour {
         _c = new GradientColorKey[_keycount];
         _a = new GradientAlphaKey[_keycount];
         Reset();
+        SetColors();
     }
 
 
     /// <summary>
-    /// Reset the CCA2D object to its initial state.
+    /// Reset the compute shader kernel to its initial state.
     /// </summary>
-    /// <param name="/*END_USER_CODE*/"></param>
     public void Reset() {
         _readTex = CreateTexture(RenderTextureFormat.RFloat);
         _writeTex = CreateTexture(RenderTextureFormat.RFloat);
@@ -115,7 +116,9 @@ public class CCA : MonoBehaviour {
         SwapTex();
     }
 
-
+    /// <summary>
+    /// Randomize the parameters of the Cellular Automata algorithm.
+    /// </summary>
     private void RandomizeParams() {
         var rand = new System.Random();
         range = (int)(rand.NextDouble() * (MAX_RANGE - 1)) + 1;
@@ -161,32 +164,8 @@ public class CCA : MonoBehaviour {
         cs.SetVectorArray(Colors, colors);
     }
 
-
     /// <summary>
-    /// Add noise to the CCA2D object using a compute shader.
-    /// </summary>
-    public void AddNoise() {
-        var kernel = cs.FindKernel(SecondaryNoiseKernel);
-        cs.SetTexture(kernel, ReadTex, _readTex);
-        cs.SetTexture(kernel, WriteTex, _writeTex);
-        cs.Dispatch(kernel, rez, rez, 1);
-    
-        SwapTex();
-    }
-    
-    /// <summary>
-    /// Set the primary CCA parameters such as range, threshold, nStates, and mooreAlgo.
-    /// </summary>
-    // public void SetPrimaryParams() {
-    //     cs.SetInt(Range, range);
-    //     cs.SetInt(Threshold, threshold);
-    //     cs.SetInt(NStates, nStates);
-    //     cs.SetBool(MooreAlgo, mooreAlgo);
-    // }
-    //
-
-    /// <summary>
-    /// Perform a single step of the Cellular Automaton algorithm.
+    /// Perform a single step of the Cellular Automata algorithm.
     /// </summary>
     public void Step() {
         cs.SetTexture(_stepKernel, ReadTex, _readTex);
