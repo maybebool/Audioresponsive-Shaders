@@ -1,46 +1,33 @@
 using UnityEngine;
 
 namespace Noise {
-    public abstract class NoiseGridInstance : MonoBehaviour
-    {
+    public abstract class NoiseGridInstance : MonoBehaviour {
+        private const string InTex = "_inTex";
+        private const string Rez = "_Rez";
+        
 
-        public uint rez = 64; // How many instances per side. (rez * rez => total instances)
-        public CustomRenderTexture inTex; // The texture we will use as a base
+        public uint rez = 64; 
+        public CustomRenderTexture inTex; 
     
-        public Material outMat; // the instancing shader material
-        public Mesh iMesh; // the mesh to instance
+        public Material outMat; 
+        public Mesh iMesh;
     
-        protected ComputeBuffer _bufferArgumentsData; // instance info to pass to the shader
-        protected int audioBand;
+        protected ComputeBuffer _bufferArgumentsData;
         protected Bounds _bounds;
     
-        void Start()
+        private void Start()
         {
-            // Indirect Args Buffer determines how many instances to draw
             _bufferArgumentsData = new ComputeBuffer(5, sizeof(int), ComputeBufferType.IndirectArguments);
             var arguments = new uint[5];
-            arguments[0] = iMesh.GetIndexCount(0); // index count per instance,
-            arguments[1] = rez * rez; // instance count,
-            arguments[2] = iMesh.GetIndexStart(0); // start index location,
-            arguments[3] = iMesh.GetBaseVertex(0); // base vertex location,
-            arguments[4] = 0; // start instance location.
-            _bufferArgumentsData.SetData(arguments); // Store it to a buffer in GPU land
-
-            // Set bounds
+            arguments[0] = iMesh.GetIndexCount(0);
+            arguments[1] = rez * rez;
+            arguments[2] = iMesh.GetIndexStart(0); 
+            arguments[3] = iMesh.GetBaseVertex(0); 
+            arguments[4] = 0; 
+            _bufferArgumentsData.SetData(arguments); 
             _bounds = new Bounds(Vector3.zero, Vector3.one * 100);
-        
-            // Pass texture to shader graph
-            outMat.SetTexture("_inTex", inTex);
-            outMat.SetFloat("_Rez", rez);
-            
-            var countBand = 0;
-            for (int i = 0; i < 8; i++)
-            {
-                var band = countBand % 8;
-                audioBand = band;
-                countBand++;
-            }
-
+            outMat.SetTexture(InTex, inTex);
+            outMat.SetFloat(Rez, rez);
         }
 
         
