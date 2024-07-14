@@ -41,11 +41,8 @@ float4 hsb2rgb(float3 c) {
 	return float4(o.r, o.g, o.b, 1);
 }
 
-void Render(uint3 id, float state, int count) {
+void Render(uint3 id, float state) {
 	float s = state / (float)nStates;
-	float c = count / ((float)threshold);
-	////////////////////////////////////////////
-	// Basic
 	if (true) {
 		outTex[id.xy] = s;
 	}
@@ -54,9 +51,8 @@ void Render(uint3 id, float state, int count) {
 	if (true) {
 		outTex[id.xy] = colors[state];
 	}
-
-	////////////////////////////////////////////
-	// Crop
+	
+	// Crop gradient border 
 	float d = distance(float2(rez / 2.0, rez / 2.0), id.xy) / (rez / 2.0);
 	outTex[id.xy] *= smoothstep(.9, .8, d);
 }
@@ -65,9 +61,7 @@ void Render(uint3 id, float state, int count) {
  * This method performs one step in the cellular automaton process. It reads the state at the given id.xy coordinates,
  * counts the number of neighboring cells in the next state, determines the next state based on the count and threshold,
  * writes the new state to the writeTex texture, and finally calls the Render method to update the outTex texture.
- *
  * @param id The coordinates of the current thread in the dispatch group.
- *
  * @note This method requires the following variables to be defined and accessible from the calling context:
  *       readTex, sampler_readTex, writeTex, outTex, range, threshold, nStates, mooreAlgo, rez, and colors.
  */
@@ -100,6 +94,6 @@ void StepKernel(uint3 id : SV_DispatchThreadID)
 	}
 	
 	writeTex[id.xy] = state;
-	Render(id, state, count);
+	Render(id, state);
 }
 
