@@ -18,61 +18,52 @@ float Angle(float3 f1, float3 f2)
             pow(f2.x, 2) + pow(f2.y, 2) + pow(f2.z, 2)));
 }
 
-float3 targetPointPos;
-float3 repulsionPointPos;
-
-float separationMultiplier;
-float alignmentMultiplier;
-float cohesionMultiplier;
-float leadershipMultiplier;
-float targetPointMultiplier;
-
-float NoClumpingArea;
-float LocalArea;
-float RepulsionArea;
-
-float DeltaTime;
-
+// Audio reactive values
 float speedValueMin;
 float speedValueMax;
 bool useAudioBasedSpeed;
-float Speed;
+float speed;
 float amplitudeBuffer;
 int numBoids;
 
-// bool useColorAudio;
-// float color1r;
-// float color1g;
-// float color1b;
-// float color2r;
-// float color2g;
-// float color2b;
-// float computeColorR;
-// float computeColorG;
-// float computeColorB;
-// float colorMultiplier;
+// Boid values
+float noCompressionArea;
+float localArea;
+float repulsionArea;
+float3 targetPointPos;
+float3 repulsionPointPos;
+float separationFactor;
+float alignmentFactor;
+float cohesionFactor;
+float leadershipWeight;
+float centerWeight;
 
-RWStructuredBuffer<Boid> boids;
+
+float deltaTime;
+
+
+
+RWStructuredBuffer<Boid> boid_bodies;
 
 [numthreads(threadGroupSize,1,1)]
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
     //Initialisation of boids data on thread
-    Boid boidA = boids[id.x];
+    Boid boid_one = boid_bodies[id.x];
 
-    const float3 zero = float3(0.0, 0.0, 0.0);
+    const float3 origin = float3(0.0, 0.0, 0.0);
 
-    float3 alignmentDirection = zero;
-    float3 separationDirection = zero;
-    float3 cohesionDirection = zero;
-    int separationCount = 1;
-    int localCount = 1;
+    float3 align_vector = origin;
+    float3 sep_vector = origin;
+    float3 coh_vector = origin;
+    int separation_count = 1;
+    int local_count = 1;
 
-    float3 tempSteer = zero;
-    float3 leaderSteering = zero;
+    float3 temp_steer = origin;
+    float3 leaderSteering = origin;
 
-    float leaderAngle = 180.0;
-    Boid leaderBoid = boidA;
+    float leader_angle = 180.0;
+    Boid leaderBoid = boid_one;
 
     //Validating BoidA against a new BoidB
     for (int indexB = 0; indexB < numBoids; indexB++)
@@ -80,90 +71,83 @@ void CSMain(uint3 id : SV_DispatchThreadID)
         //If BoidB doesn't equal BoidA
         if (indexB != int(id.x))
         {
-            Boid boidB = boids[indexB];
+            Boid boid_b = boid_bodies[indexB];
 
             //Checking how far away BoidB is from BoidA
-            float3 boidDiff = boidA.position - boidB.position;
-            float boidLength = length(boidDiff);
+            float3 neighbour_gap = boid_one.position - boid_b.position;
+            float gap_length = length(neighbour_gap);
 
             //Separation
-            if (boidLength < NoClumpingArea)
+            if (gap_length < noCompressionArea)
             {
-                separationDirection += boidDiff;
-                separationCount++;
+                sep_vector += neighbour_gap;
+                separation_count++;
             }
 
             //Cohesion and Alignment
-            if (boidLength < LocalArea)
+            if (gap_length < localArea)
             {
-                alignmentDirection += boidB.forward;
-                cohesionDirection += boidB.position;
-                localCount++;
+                align_vector += boid_b.forward;
+                coh_vector += boid_b.position;
+                local_count++;
 
                 //Calculating a leader Boid
-                float angle = Angle(boidB.position - boidA.position, boidA.forward);
-                if (angle < leaderAngle && angle < 90.0)
+                float angle = Angle(boid_b.position - boid_one.position, boid_one.forward);
+                if (angle < leader_angle && angle < 90.0)
                 {
-                    leaderBoid = boidB;
-                    leaderAngle = angle;
-                    tempSteer += normalize(leaderBoid.position - boidA.position) * leadershipMultiplier;
+                    leaderBoid = boid_b;
+                    leader_angle = angle;
+                    temp_steer += normalize(leaderBoid.position - boid_one.position) * leadershipWeight;
                 }
             }
         }
     }
 
     //Factoring neighbouring boid count into separation modifier
-    if (separationCount > 1)
+    if (separation_count > 1)
     {
-        separationDirection /= separationCount;
+        sep_vector /= separation_count;
     }
 
     //Factoring neighbouring boid count into cohesion and alignment modifier
-    float avg = 1.0 / localCount;
-    alignmentDirection *= avg;
-    cohesionDirection *= avg;
+    float avarage = 1.0 / local_count;
+    align_vector *= avarage;
+    coh_vector *= avarage;
 
     //Repulsion target calculation
-    float repulsionToBoid = length(repulsionPointPos - boidA.position);
-    if (repulsionToBoid <= RepulsionArea)
+    float boid_to_boid_rep = length(repulsionPointPos - boid_one.position);
+    if (boid_to_boid_rep <= repulsionArea)
     {
-        tempSteer -= repulsionPointPos - boidA.position;
+        temp_steer -= repulsionPointPos - boid_one.position;
     }
 
-    cohesionDirection = normalize(cohesionDirection - boidA.position);
+    coh_vector = normalize(coh_vector - boid_one.position);
 
     //Adding them all to a steering value
-    tempSteer += (separationDirection * separationMultiplier) +
-        (alignmentDirection * alignmentMultiplier) +
-        (cohesionDirection * cohesionMultiplier) +
-        ((targetPointPos - boidA.position) * targetPointMultiplier);
+    temp_steer += (sep_vector * separationFactor) +
+        (align_vector * alignmentFactor) +
+        (coh_vector * cohesionFactor) +
+        ((targetPointPos - boid_one.position) * centerWeight);
 
     //Accounting for collisions from raycasts
-    if (any(boidA.raySteer))
+    if (any(boid_one.raySteer))
     {
-        tempSteer = boidA.raySteer;
+        temp_steer = boid_one.raySteer;
     }
 
     //Steering correction
-    float steeringCorrection = exp(-boidA.steering * DeltaTime);
+    float steeringCorrection = exp(-boid_one.steering * deltaTime);
 
     //Steering boid
-    boidA.forward = lerp(tempSteer, normalize(boidA.forward), steeringCorrection);
-
-    // if (useColorAudio)
-    // {
-    //     computeColorR = lerp(color1r,color2r, (amplitudeBuffer + 1) * colorMultiplier);
-    //     computeColorG = lerp(color1g,color2g, (amplitudeBuffer + 1) * colorMultiplier);
-    //     computeColorB = lerp(color1b,color2b, (amplitudeBuffer + 1) * colorMultiplier);
-    // }
+    boid_one.forward = lerp(temp_steer, normalize(boid_one.forward), steeringCorrection);
 
     //Moving boid
     if (useAudioBasedSpeed)
     {
-        Speed = lerp(speedValueMin, speedValueMax, amplitudeBuffer);
+        speed = lerp(speedValueMin, speedValueMax, amplitudeBuffer);
     }
-    boidA.position += boidA.forward * (Speed * DeltaTime);
+    boid_one.position += boid_one.forward * (speed * deltaTime);
 
     //Updating boid position and rotation
-    boids[id.x] = boidA;
+    boid_bodies[id.x] = boid_one;
 }

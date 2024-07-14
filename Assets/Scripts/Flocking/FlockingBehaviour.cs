@@ -7,95 +7,88 @@ using UnityEngine.Serialization;
 
 namespace Flocking {
     public abstract class FlockingBehaviour : MonoBehaviour {
+        // avoiding hard code errors
         #region Constants for Declarations
 
-        // avoiding hard code errors
-        private const string TargetPointPos = "targetPointPos";
-        private const string RepulsionPointPos = "repulsionPointPos";
-        private const string DeltaTime = "DeltaTime";
-        private const string NumBoids = "numBoids";
-        private const string LocalArea = "LocalArea";
-        private const string NoClumpingArea = "NoClumpingArea";
-        private const string RepulsionArea = "RepulsionArea";
-        private const string SeparationMultiplier = "separationMultiplier";
-        private const string AlignmentMultiplier = "alignmentMultiplier";
-        private const string CohesionMultiplier = "cohesionMultiplier";
-        private const string LeadershipMultiplier = "leadershipMultiplier";
-        private const string TargetPointMultiplier = "targetPointMultiplier";
+        protected const int threadGroupSize = 128;
+        protected const string Smoothness = "_Smoothness";
+        protected const string BoidBodies = "boid_bodies";
+        
+        // Audio reactive constants
         private const string AmplitudeAudioBuffer = "amplitudeBuffer";
         private const string SpeedValueMin = "speedValueMin";
         private const string SpeedValueMax = "speedValueMax";
         private const string UseAudioBasedSpeed = "useAudioBasedSpeed";
-        private const string UseColorAudio = "useColorAudio";
-        protected const string Smoothness = "_Smoothness";
-        // private const string Color1r = "color1r";
-        // private const string Color1g = "color1g";
-        // private const string Color1b = "color1b";
-        // private const string Color2r = "color2r";
-        // private const string Color2g = "color2g";
-        // private const string Color2b = "color2b";
-        // private const string ComputeColorR = "computeColorR";
-        // private const string ComputeColorG = "computeColorG";
-        // private const string ComputeColorB = "computeColorB";
-        private const string ColorMultiplier = "colorMultiplier";
-        private const string Speed = "Speed";
+        
+        // Boid Behaviour constants
+        private const string Speed = "speed";
         private const string SteeringSpeed = "steeringSpeed";
+        private const string NumBoids = "numBoids";
+        private const string TargetPointPos = "targetPointPos";
+        private const string RepulsionPointPos = "repulsionPointPos";
+        private const string NoCompressionArea = "noCompressionArea";
+        private const string SeparationFactor = "separationFactor";
+        private const string AlignmentFactor = "alignmentFactor";
+        private const string CohesionFactor = "cohesionFactor";
+        private const string LeadershipWeight = "leadershipWeight";
+        
+        // Level Behaviour Constants
+        private const string LocalArea = "localArea";
+        private const string RepulsionArea = "repulsionArea";
+        private const string CenterWeight = "centerWeight";
+        private const string DeltaTime = "deltaTime";
 
         #endregion
 
 
         #region Variables
 
+        [Header("Audio reactive Settings")]
+        [Space]
+        [SerializeField] public bool useMaterialSmoothness;
+        [SerializeField] protected Vector2 minMaxValueSmoothness;
+        [Range(0f,1f)] [SerializeField] protected float smoothnessThreshold;
+        [SerializeField] protected Material material;
+        [Space]
+        [SerializeField] private bool useAudioBasedSpeed;
+        [SerializeField] public float speedValueMin;
+        [SerializeField] public float speedValueMax;
+        [Space]
+        [SerializeField] protected bool useScale;
+        [SerializeField] protected Vector2 minMaxValueScale;
+        [Space]
         [SerializeField] public AudioData audioData;
-        [HideInInspector] public int audioBand;
-        [SerializeField] public bool useColorAudio;
-        [SerializeField] protected float colorMultiplier;
-        [SerializeField] protected float colorMultiplier2;
-        //[HideInInspector] public float color1r,color1g,color1b, color2r,color2g, color2b,computeColorR,computeColorG,computeColorB;
-        [SerializeField] protected Color color1;
-        [SerializeField] protected Color color2;
-
-        protected const int threadGroupSize = 128;
-        [HideInInspector] [SerializeField] protected Material defaultMat;
-        [HideInInspector] [SerializeField] protected ComputeShader compute;
-        protected Vector3 targetPointPos;
-        protected Vector3 repulsionPointPos;
+        
+        
+        private Vector3 targetPointPos;
+        private Vector3 repulsionPointPos;
         protected NativeArray<RaycastCommand> rayCommands;
         protected NativeArray<RaycastHit> rayHits;
         protected JobHandle jobHandle;
         protected Transform[] boidsArray;
 
-        [Header("Boid Preset")] 
+        [Header("Boid Settings")]
         [SerializeField] protected GameObject boidPrefab;
-        // [SerializeField] private Vector2 scaleValueMinMax;
-        //[SerializeField] private bool useScale;
-        [SerializeField] private bool useAudioBasedSpeed;
-        [SerializeField] public float speedValueMin;
-        [SerializeField] public float speedValueMax;
-
-        [SerializeField] protected bool useDefaultMaterial = true;
-
-        [Header("Spawning")] [SerializeField] protected int spawnBoids = 2048;
-        [SerializeField] protected float spawnRange = 50;
-
-        [Header("Movement")] 
-        [SerializeField] protected float speed = 20f;
+        [SerializeField] protected int amountOfBoids = 500;
+        [SerializeField] protected float spawningField = 200;
+        [Space]
+        [SerializeField] protected float speed = 10f;
         [SerializeField] protected float steeringSpeed = 2f;
+        [SerializeField] protected float separationFactor = 0.6f;
+        [SerializeField] protected float alignmentFactor = 0.3f;
+        [SerializeField] protected float cohesionFactor = 0.1f;
+        [Space]
         [SerializeField] protected float localArea = 40f;
-        [SerializeField] protected float noClumpingArea = 5f;
+        [SerializeField] protected float noCompressionArea = 5f;
         [SerializeField] protected float repulsionArea = 5f;
         [SerializeField] protected Transform targetPoint;
         [SerializeField] protected Transform repulsionPoint;
+        [SerializeField] protected float leadershipWeight = 0.01f;
+        [SerializeField] protected float centerWeight = 0.0001f;
 
-        [Header("Behaviours")] 
-        [SerializeField] protected float separationMultiplier = 0.6f;
-        [SerializeField] protected float alignmentMultiplier = 0.3f;
-        [SerializeField] protected float cohesionMultiplier = 0.1f;
-        [SerializeField] protected float leadershipMultiplier = 0.01f;
-        [SerializeField] protected float targetPointMultiplier = 0.001f;
-
-        [Header("Misc")] 
-        [Range(0f, 100f)] [SerializeField] protected float simulationSpeed = 1f;
+        [HideInInspector] [SerializeField] protected ComputeShader compute;
+        [HideInInspector] public int audioBand;
+        
 
         #endregion
 
@@ -117,12 +110,9 @@ namespace Flocking {
         protected abstract void InitializeBoidData();
 
         protected virtual void Awake() {
-            // if (useDefaultMaterial == true) {
-            //     boidPrefab.GetComponent<Renderer>().sharedMaterial = GetDefaultMaterial();
-            // }
 
             //Boids initialisaton, adds all boids to an array.
-            boidsArray = new Transform[spawnBoids];
+            boidsArray = new Transform[amountOfBoids];
             rayCommands = new NativeArray<RaycastCommand>(boidsArray.Length, Allocator.Persistent);
             rayHits = new NativeArray<RaycastHit>(boidsArray.Length, Allocator.Persistent);
 
@@ -165,55 +155,44 @@ namespace Flocking {
         protected void SetComputeParameters() {
             compute.SetVector(TargetPointPos, targetPointPos);
             compute.SetVector(RepulsionPointPos, repulsionPointPos);
-            compute.SetFloat(DeltaTime, Time.deltaTime * simulationSpeed);
+            compute.SetFloat(DeltaTime, Time.deltaTime * 3);
             compute.SetFloat(AmplitudeAudioBuffer, audioData.amplitudeBuffer);
             compute.SetFloat(SpeedValueMin, speedValueMin);
             compute.SetFloat(SpeedValueMax, speedValueMax);
             compute.SetFloat(Speed, speed);
-            compute.SetFloat(ColorMultiplier, colorMultiplier);
-            // compute.SetFloat(Color1r,color1r);
-            // compute.SetFloat(Color1g,color1g);
-            // compute.SetFloat(Color1b,color1b);
-            // compute.SetFloat(Color2r,color2r);
-            // compute.SetFloat(Color2g,color2g);
-            // compute.SetFloat(Color2b,color2b);
-            // compute.SetFloat(ComputeColorR, computeColorR);
-            // compute.SetFloat(ComputeColorG, computeColorG);
-            // compute.SetFloat(ComputeColorB, computeColorB);
         }
 
         /// <summary>
         /// Sets initial compute parameters which only need to be set on initialize
         /// </summary>
         protected virtual void InitialiseBuffer() {
-            compute.SetInt(NumBoids, spawnBoids);
+            compute.SetInt(NumBoids, amountOfBoids);
             compute.SetFloat(LocalArea, localArea);
-            compute.SetFloat(NoClumpingArea, noClumpingArea);
+            compute.SetFloat(NoCompressionArea, noCompressionArea);
             compute.SetFloat(RepulsionArea, repulsionArea);
-            compute.SetFloat(SeparationMultiplier, separationMultiplier);
-            compute.SetFloat(AlignmentMultiplier, alignmentMultiplier);
-            compute.SetFloat(CohesionMultiplier, cohesionMultiplier);
-            compute.SetFloat(LeadershipMultiplier, leadershipMultiplier);
-            compute.SetFloat(TargetPointMultiplier, targetPointMultiplier);
+            compute.SetFloat(SeparationFactor, separationFactor);
+            compute.SetFloat(AlignmentFactor, alignmentFactor);
+            compute.SetFloat(CohesionFactor, cohesionFactor);
+            compute.SetFloat(LeadershipWeight, leadershipWeight);
+            compute.SetFloat(CenterWeight, centerWeight);
             compute.SetBool(UseAudioBasedSpeed, useAudioBasedSpeed);
-            compute.SetBool(UseColorAudio, useColorAudio);
             compute.SetFloat(SteeringSpeed, steeringSpeed);
         }
 
         protected void SpawnBoid(int index) {
             var boidInstance = Instantiate(boidPrefab, transform);
-            boidInstance.transform.localPosition = new Vector3(Random.Range(-spawnRange, spawnRange),
-                Random.Range(-spawnRange, spawnRange), Random.Range(-spawnRange, spawnRange));
+            boidInstance.transform.localPosition = new Vector3(Random.Range(-spawningField, spawningField),
+                Random.Range(-spawningField, spawningField), Random.Range(-spawningField, spawningField));
 
             boidsArray[index] = boidInstance.transform;
         }
 
         protected virtual void OnDrawGizmosSelected() {
             Gizmos.color = new Color(1, 0, 0, 0.5f);
-            Gizmos.DrawWireCube(transform.position, new Vector3(spawnRange * 2, spawnRange * 2, spawnRange * 2));
+            Gizmos.DrawWireCube(transform.position, new Vector3(spawningField * 2, spawningField * 2, spawningField * 2));
 
-            if (debugPositions.Length == spawnBoids) {
-                for (int i = 0; i < spawnBoids; i++) {
+            if (debugPositions.Length == amountOfBoids) {
+                for (int i = 0; i < amountOfBoids; i++) {
                     Gizmos.DrawWireSphere
                     (
                         new Vector3(transform.position.x + debugPositions[i].x,
@@ -223,18 +202,18 @@ namespace Flocking {
                 }
             }
 
-            if (spawnBoids == 0) return;
-            var regeneratePositions = debugPositions.Length != spawnBoids || lastSpawnRange != spawnRange;
+            if (amountOfBoids == 0) return;
+            var regeneratePositions = debugPositions.Length != amountOfBoids || lastSpawnRange != spawningField;
             if (!regeneratePositions && debugPositions[0].x != 0 && debugPositions[0].y != 0 &&
                 debugPositions[0].z != 0) return;
 
-            debugPositions = new Vector3[spawnBoids];
-            lastSpawnRange = spawnRange;
-            for (int i = 0; i < spawnBoids; i++) {
+            debugPositions = new Vector3[amountOfBoids];
+            lastSpawnRange = spawningField;
+            for (int i = 0; i < amountOfBoids; i++) {
                 debugPositions[i] = new Vector3(
-                    Random.Range(debugPositions[i].x - spawnRange, debugPositions[i].x + spawnRange),
-                    Random.Range(debugPositions[i].y - spawnRange, debugPositions[i].y + spawnRange),
-                    Random.Range(debugPositions[i].z - spawnRange, debugPositions[i].z + spawnRange));
+                    Random.Range(debugPositions[i].x - spawningField, debugPositions[i].x + spawningField),
+                    Random.Range(debugPositions[i].y - spawningField, debugPositions[i].y + spawningField),
+                    Random.Range(debugPositions[i].z - spawningField, debugPositions[i].z + spawningField));
             }
         }
     }

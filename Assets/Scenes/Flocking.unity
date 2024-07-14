@@ -2008,6 +2008,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
+      propertyPath: material
+      value: 
+      objectReference: {fileID: 2100000, guid: 564b694df425a8640908727c1f6ba267, type: 2}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
       propertyPath: useScale
       value: 1
       objectReference: {fileID: 0}
@@ -2110,6 +2115,11 @@ PrefabInstance:
         type: 3}
       propertyPath: colorMultiplier
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: simulationSpeed
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
@@ -2398,6 +2408,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
+      propertyPath: minMaxValueSpeed.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: minMaxValueSpeed.y
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
       propertyPath: speedValueMinMax.x
       value: 10
       objectReference: {fileID: 0}
@@ -2438,7 +2458,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
+      propertyPath: useMaterialSmoothness
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
       propertyPath: minMaxValueSmothness.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: minMaxValueSmoothness.y
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,

@@ -12,25 +12,9 @@ namespace Flocking {
 
         [Header("Collisions")]
         [SerializeField] protected LayerMask terrainMask;
-        [SerializeField] private Vector2 minMaxValueScale;
-        [SerializeField] private Vector2 minMaxValueSmothness;
         [SerializeField] protected float raycastDistance = 100f;
         [SerializeField] protected float collisionAdjustment = 50f;
         [SerializeField] protected RaycastType raycastType = RaycastType.Synchronous;
-        [SerializeField] private bool useScale;
-        [SerializeField] private string stringName;
-        
-        public Material _material;
-        private Material[] _audioMaterial;
-        
-        
-        
-        public string _colorName1;
-        private Color[] _color1;
-        
-        [Range(0f,1f)] public float smoothnessThreshold;
-        public float _colorMultiplier1;
-        
 
         protected override int ComputeBufferSize => BoidConductValues.Size;
 
@@ -45,14 +29,6 @@ namespace Flocking {
         }
         
         private void Start() {
-           // _material.SetColor(_colorName1, Color.green);
-            // _audioMaterial = new Material[8];
-            // _color1 = new Color[8];
-            // for (int i = 0; i < 8; i++)
-            // {
-            //     //_color1[i] = _gradient1.((1f / 8f) * i);
-            //     _audioMaterial[i] = new Material(_material);
-            // }
             var countBand = 0;
             for (int i = 0; i < boidsArray.Length; i++)
             {
@@ -68,11 +44,11 @@ namespace Flocking {
 
             var boidBuffer = new ComputeBuffer(boidsArray.Length, ComputeBufferSize);
             boidBuffer.SetData(_boidValues);
-            compute.SetBuffer(0, "boids", boidBuffer);
+            compute.SetBuffer(0, BoidBodies, boidBuffer);
 
             SetComputeParameters();
 
-            var threadGroups = Mathf.CeilToInt(spawnBoids / (float)threadGroupSize);
+            var threadGroups = Mathf.CeilToInt(amountOfBoids / (float)threadGroupSize);
             compute.Dispatch(0, threadGroups, 1, 1);
 
             boidBuffer.GetData(_boidValues);
@@ -98,15 +74,15 @@ namespace Flocking {
             }
 
 
-            if (useColorAudio) {
+            if (useMaterialSmoothness) {
                 if (audioData.amplitudeBuffer > smoothnessThreshold) {
-                    var lerpValue = Mathf.Lerp(minMaxValueSmothness.x, minMaxValueSmothness.y,
+                    var lerpValue = Mathf.Lerp(minMaxValueSmoothness.x, minMaxValueSmoothness.y,
                         audioData.amplitudeBuffer);
-                    _material.SetFloat(Smoothness, 1 - lerpValue);
+                    material.SetFloat(Smoothness, 1 - lerpValue);
                 }
             }
             else {
-                _material.SetFloat(Smoothness,0);
+                material.SetFloat(Smoothness,0);
             }
 
             
