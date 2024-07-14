@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace LevelManagement.UIs {
-    public class CCAUI : MonoBehaviour
+    public class EOCUI : MonoBehaviour
     {
         [SerializeField] private Button backToMenuButton;
         [SerializeField] private EOCCCA eoc;

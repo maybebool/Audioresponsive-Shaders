@@ -1,0 +1,120 @@
+#pragma kernel ResetKernel
+#pragma kernel StepKernel
+#pragma kernel SecondaryNoiseKernel
+
+Texture2D<float> readTex;
+SamplerState sampler_readTex;
+
+RWTexture2D<float> writeTex;
+RWTexture2D<float4> outTex;
+
+int range;
+uint threshold;
+uint nStates;
+bool mooreAlgo;
+
+int rez;
+
+float4 colors[21];
+
+
+ // from "The Art of Code" on YouTube https://www.youtube.com/@TheArtofCodeIsCool
+float2 Random(float2 p) {
+	float3 a = frac(p.xyx * float3(123.34, 234.34, 345.65));
+	a += dot(a, a + 34.45);
+	return frac(float2(a.x * a.y, a.y * a.z));
+}
+
+[numthreads(1, 1, 1)]
+void ResetKernel(uint3 id : SV_DispatchThreadID)
+{
+	writeTex[id.xy] = (int)(Random(id.xy*.01).x * nStates);
+}
+
+
+ //  Function from Iñigo Quiles
+ //  https://www.shadertoy.com/view/MsS3Wc
+ // https://thebookofshaders.com/06/
+float4 hsb2rgb(float3 c) {
+	float3 rgb = clamp(abs(((c.x * 6.0 + float3(0.0, 4.0, 2.0)) % 6.0) - 3.0) - 1.0, 0.0, 1.0);
+	rgb = rgb * rgb * (3.0 - 2.0 * rgb);
+	float3 o = c.z * lerp(float3(1.0, 1.0, 1.0), rgb, c.y);
+	return float4(o.r, o.g, o.b, 1);
+}
+
+void Render(uint3 id, float state, int count) {
+	float s = state / (float)nStates;
+	float c = count / ((float)threshold);
+	////////////////////////////////////////////
+	// Basic
+	if (true) {
+		outTex[id.xy] = s;
+	}
+
+	// Preset index
+	if (true) {
+		outTex[id.xy] = colors[state];
+	}
+
+	////////////////////////////////////////////
+	// Crop
+	float d = distance(float2(rez / 2.0, rez / 2.0), id.xy) / (rez / 2.0);
+	outTex[id.xy] *= smoothstep(.9, .8, d);
+}
+
+/**
+ * This method performs one step in the cellular automaton process. It reads the state at the given id.xy coordinates,
+ * counts the number of neighboring cells in the next state, determines the next state based on the count and threshold,
+ * writes the new state to the writeTex texture, and finally calls the Render method to update the outTex texture.
+ *
+ * @param id The coordinates of the current thread in the dispatch group.
+ *
+ * @note This method requires the following variables to be defined and accessible from the calling context:
+ *       readTex, sampler_readTex, writeTex, outTex, range, threshold, nStates, mooreAlgo, rez, and colors.
+ */
+[numthreads(16, 16, 1)]
+
+void StepKernel(uint3 id : SV_DispatchThreadID)
+{
+	// READ STATE
+	uint state = readTex[id.xy];
+
+	uint count = 0;
+	uint next = state + 1 == nStates ? 0 : state + 1; 
+	
+	for (int x = -range; x <= range; x++) {
+		for (int y = -range; y <= range; y++) {
+			
+			if ((x == 0 && y == 0)) {
+				continue;
+			}
+
+			if (mooreAlgo || (x == 0 || y == 0)) {
+				uint s = readTex.SampleLevel(sampler_readTex, (id.xy + int2(x, y)) / (float)rez, 0);
+				count += (uint) (s == next);
+			}
+		}
+	}
+
+	
+	if (count >= (threshold)) {
+		state = (state + 1) % nStates;
+	}
+
+	// WRITE STATE
+	writeTex[id.xy] = state;
+
+	Render(id, state, count);
+}
+
+
+[numthreads(1, 1, 1)]
+void SecondaryNoiseKernel(uint3 id : SV_DispatchThreadID)
+{
+	// if the state will not be a wall
+	if ((uint) readTex[id.xy] < (uint) nStates) {
+		// add noise
+		writeTex[id.xy] = (int)(Random(id.xy).x * nStates);
+	}
+}
+
