@@ -22,6 +22,8 @@ namespace Noise {
         private void Update()
         {
             SetAudioReactiveParameters();
+            
+            // main idea from this source https://www.youtube.com/watch?v=eyaxqo9JV4w
             Graphics.DrawMeshInstancedIndirect(iMesh, 0, outMat, _bounds, _bufferArgumentsData);
         }
 
