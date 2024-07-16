@@ -72,7 +72,7 @@ namespace Flocking {
                 }
             }
             else {
-                material.SetFloat(Smoothness,0);
+                material.SetFloat(Smoothness,1);
             }
         }
 
