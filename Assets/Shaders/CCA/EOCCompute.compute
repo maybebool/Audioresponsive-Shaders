@@ -32,6 +32,16 @@ void ResetK(uint3 id : SV_DispatchThreadID)
     }
 }
 
+/**
+ * @brief Executes a single step of the StepK algorithm on a specified pixel.
+ *
+ * This method is part of the EOCCompute.compute shader and is invoked by the StepK kernel.
+ * It calculates the next state of a pixel based on its surrounding neighbors' states.
+ *
+ * @param id The thread ID for the current pixel.
+ *
+ * @note This method uses the statesT, rez, and t variables defined in the EOCCompute.compute shader.
+ */
 [numthreads(32, 1, 1)]
 void StepK(uint3 id : SV_DispatchThreadID)
 {
