@@ -11,7 +11,7 @@ struct Boid
     float steering;
 };
 
-float Angle(float3 v1, float3 v2)
+float CalcAngle(float3 v1, float3 v2)
 {
     // Calculate the dot product of v1 and v2
     float dotProduct = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
@@ -92,7 +92,7 @@ void CSMain(uint3 id : SV_DispatchThreadID)
                 local_count++;
 
                 //Calculating a leader Boid
-                float angle = Angle(boid_b.position - boid_one.position, boid_one.forward);
+                float angle = CalcAngle(boid_b.position - boid_one.position, boid_one.forward);
                 if (angle < leader_angle && angle < 90.0)
                 {
                     leaderBoid = boid_b;

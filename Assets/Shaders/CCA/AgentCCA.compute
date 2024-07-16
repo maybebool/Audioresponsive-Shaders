@@ -1,17 +1,10 @@
-// Reset
 #pragma kernel ResetTextureKernel
 #pragma kernel ResetAgentsKernel
-
-// Step
 #pragma kernel MoveAgentsKernel
 #pragma kernel WriteTrailsKernel
 #pragma kernel DiffuseTextureKernel
-
-
-// Render
 #pragma kernel AgentsDebugKernel
 #pragma kernel RenderKernel
-
 
 Texture2D readTex;
 SamplerState sampler_readTex;
@@ -28,23 +21,14 @@ struct Agent
 
 RWStructuredBuffer<Agent> agentsBuffer;
 
-
 uint rez;
-uint stepn;
+uint stepN;
 uint time;
 float trailDecayFactor;
 float2 hitXY;
 int brushSize;
 
-/*
-*
-*
-* UTIL
-*
-*
-*/
-
-// via "The Art of Code" on Youtube
+// From "The Art of Code" on YouTube
 float2 Random(float2 p) {
 	float3 a = frac(p.xyx * float3(123.34, 234.34, 345.65));
 	a += dot(a, a + 34.45);
@@ -56,13 +40,6 @@ float2 RandomDirection(float2 p) {
 }
 
 
-/*
-*
-*
-* RESET
-*
-*
-*/
 
 [numthreads(1, 1, 1)]
 void ResetTextureKernel(uint3 id : SV_DispatchThreadID)
@@ -71,6 +48,16 @@ void ResetTextureKernel(uint3 id : SV_DispatchThreadID)
 }
 
 
+/**
+ * @brief Resets the agents in the kernel
+ *
+ * This method resets the position and direction of the agents in the simulation.
+ * The position of each agent is set to a random value based on the current thread ID, time, and the resolution.
+ * The direction of each agent is set to a random direction based on the current thread ID, time, and a sine function.
+ * The agents are then stored in the agentsBuffer.
+ *
+ * @param id The current thread ID as a uint3
+ */
 [numthreads(64, 1, 1)]
 void ResetAgentsKernel(uint3 id : SV_DispatchThreadID)
 {
@@ -82,14 +69,16 @@ void ResetAgentsKernel(uint3 id : SV_DispatchThreadID)
 	agentsBuffer[id.x] = a;
 }
 
-/*
-*
-*
-* STEP
-*
-*
-*/
 
+/**
+ * @brief Writes the trails created by the agents to the writeTex texture
+ *
+ * This method takes the current thread ID and retrieves the agent data from the agentsBuffer.
+ * It then writes the trail to the writeTex texture based on the agent's position.
+ * The writeTex texture is updated by adding 0.1 to the previous value at the position and clamping it between 0 and 1.
+ *
+ * @param id The current thread ID as a uint3
+ */
 [numthreads(64, 1, 1)]
 void WriteTrailsKernel(uint3 id : SV_DispatchThreadID)
 {
@@ -108,7 +97,9 @@ float2 NeighborhoodTurns(uint3 id, Agent a) {
 		for (int y = -range; y <= range; y++) {
 			if (!(x == 0 && y == 0)) {
 				float2 direction = float2(x, y);
-				// Hacky, but we are just exploring
+				
+				// this part is still under construction
+				// original idea from Arsiliath https://n.notochord.life/cohorts/2/orientation/todo
 				if (dot(normalize(direction), a.direction) > .2) {
 					uint2 coord = round(a.position + direction);
 
@@ -125,9 +116,9 @@ float2 NeighborhoodTurns(uint3 id, Agent a) {
 						i++;
 					}
 
-					if (stepn % 2 == 0) {
-						// Mark blue the neighboord being read 
-						debugTex[coord] = float4(0, 0, 1, 0);
+					if (stepN % 2 == 0) {
+						// marks de neighbour blue 
+						debugTex[coord] = float4(0, 0, 0.5, 0);
 					}
 				}
 			}
@@ -144,26 +135,33 @@ float2 NeighborhoodTurns(uint3 id, Agent a) {
 
 	d = normalize(d);
 
-	// Mark red the next direction
-	if (stepn % 2 == 0) {
-		debugTex[round(a.position + d)] += float4(1, 0, 0, 0);
+	// Marking next dir red
+	if (stepN % 2 == 0) {
+		debugTex[round(a.position + d)] += float4(1, 1, 0, 0);
 	}
 
 	return d;
 }
 
+/**
+ * @brief Moves the agents in the simulation
+ *
+ * This method calculates the new direction and position for each agent based on the current thread ID and the neighborhood turns.
+ * The new direction is calculated using the NeighborhoodTurns method.
+ * The new position is calculated by adding the current position to the direction.
+ * If the new position is out of bounds (less than 0), it is wrapped around to the maximum value (rez - 1).
+ * The new position is then wrapped around to the size of the simulation (rez) using the modulus operator.
+ * If the current step number is odd, the updated agent is stored back in the agentsBuffer.
+ *
+ * @param id The current thread ID as a uint3
+ */
 [numthreads(64, 1, 1)]
 void MoveAgentsKernel(uint3 id : SV_DispatchThreadID)
 {
 	Agent a = agentsBuffer[id.x];
-
-	// Choose next direction
 	a.direction = NeighborhoodTurns(id, a);
-
-	// Move Forward
 	a.position = a.position + a.direction;
-
-	// Boundaries: Wrap
+	
 	if (a.position.x < 0) {
 		a.position.x = rez - 1;
 	}
@@ -172,16 +170,32 @@ void MoveAgentsKernel(uint3 id : SV_DispatchThreadID)
 	}
 	a.position %= float2(rez, rez);
 
-	if (stepn % 2 == 1) {
+	if (stepN % 2 == 1) {
 		agentsBuffer[id.x] = a;
 	}
 }
 
+/**
+ * @brief Diffuses the texture in the specified area
+ *
+ * This method calculates the average value of the surrounding pixels in the texture and uses it to modify the color of the current pixel.
+ * The method takes into account the current thread ID, time, and the resolution to calculate the position of the surrounding pixels.
+ * The color of the current pixel is calculated by averaging the color values of the surrounding pixels.
+ * The calculated color is multiplied by the trail decay factor and then clamped between 0 and 1 to ensure it stays within valid color range.
+ * Additionally, if the current pixel is within the specified brush size of the hit point, it is further modified by adding 10 to its color value.
+ * The modified color is written back to the texture.
+ *
+ * @param id The current thread ID as a uint3 representing the x and y coordinates of the pixel in the texture
+ */
 [numthreads(1, 1, 1)]
 void DiffuseTextureKernel(uint3 id : SV_DispatchThreadID)
 {
 	float4 oc = readTex[id.xy];
 
+	//calculates the average of a 3x3 pixel grid from the texture (-1 up tp 1)
+	//centered around a given pixel (id.xy). It does so by iterating over the surrounding pixels, normalizes
+	//their coordinates with respect to the resolution (rez), sampling the texture's red channel at each coordinate
+	//using readTex.SampleLevel() and accumulating the values.
 	float avg = 0;
 	for (int x = -1; x <= 1; x++) {
 		for (int y = -1; y <= 1; y++) {
@@ -202,13 +216,6 @@ void DiffuseTextureKernel(uint3 id : SV_DispatchThreadID)
 
 	writeTex[id.xy] = oc;
 }
-/*
-*
-*
-* RENDER
-*
-*
-*/
 
 [numthreads(1, 1, 1)]
 void RenderKernel(uint3 id : SV_DispatchThreadID)

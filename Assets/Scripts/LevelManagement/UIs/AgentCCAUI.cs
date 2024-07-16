@@ -7,31 +7,24 @@ namespace LevelManagement.UIs {
     {
         [SerializeField] private Button backToMenuButton;
         [SerializeField] private AgentCCA agentCca;
-        // [SerializeField] private Slider agentamount;
-        [SerializeField] private Slider traildecay;
+        [SerializeField] private Slider trailDecay;
 
         
 
         private void OnEnable() {
             backToMenuButton.onClick.AddListener(OnClickBackToMenu);
-            traildecay.onValueChanged.AddListener(OnClickTrailDecaySlider);
+            trailDecay.onValueChanged.AddListener(OnClickTrailDecaySlider);
             
         }
 
         private void OnDisable() {
             backToMenuButton.onClick.RemoveListener(OnClickBackToMenu);
-            // agentamount.onValueChanged.RemoveListener(OnClickAgentAmount);
-            traildecay.onValueChanged.RemoveListener(OnClickTrailDecaySlider);
+            trailDecay.onValueChanged.RemoveListener(OnClickTrailDecaySlider);
         }
         
         
         private void OnClickBackToMenu() {
             ScenesManager.Instance.LoadMainMenu();
-        }
-
-        private void OnClickAgentAmount(float value) {
-            agentCca.agentsCount = (int)value;
-            
         }
         
         private void OnClickTrailDecaySlider(float value) {

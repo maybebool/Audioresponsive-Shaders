@@ -54,10 +54,9 @@ public class CCA : MonoBehaviour {
     private float _vMin = 0;
     
     private void Update() {
-        if (Time.frameCount % stepMod == 0) {
-            for (int i = 0; i < stepsPerFrame; i++) {
-                Step();
-            }
+        if (Time.frameCount % stepMod != 0) return;
+        for (int i = 0; i < stepsPerFrame; i++) {
+            Step();
         }
     }
 

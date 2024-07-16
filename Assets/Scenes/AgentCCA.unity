@@ -1314,15 +1314,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0de9d8c9edcaa174aaf4a0d3ff2f381b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentsCount: 30000
+  outMat: {fileID: 2100000, guid: 319853181051374408892dc86751b6d4, type: 2}
+  cs: {fileID: 7200000, guid: 3f46d5ada7452754ba1bf3d1708a5548, type: 3}
+  agentsCount: 524302
   trailDecayFactor: 0.9
-  brushSize: 10
-  interactivePlane: {fileID: 1565726042}
   rez: 512
   stepsPerFrame: 1
   stepMod: 1
-  outMat: {fileID: 2100000, guid: 319853181051374408892dc86751b6d4, type: 2}
-  cs: {fileID: 7200000, guid: 3f46d5ada7452754ba1bf3d1708a5548, type: 3}
 --- !u!1 &2066381806
 GameObject:
   m_ObjectHideFlags: 0
@@ -1429,7 +1427,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   backToMenuButton: {fileID: 974492577}
   agentCca: {fileID: 1859736080}
-  traildecay: {fileID: 1474025962}
+  trailDecay: {fileID: 1474025962}
 --- !u!4 &2097562711
 Transform:
   m_ObjectHideFlags: 0

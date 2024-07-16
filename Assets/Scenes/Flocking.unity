@@ -2684,6 +2684,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5664bbbb6557fd74ca1b72f9e5f85419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bandCount: 8
   audioBand: []
   audioBandBuffer: []
   amplitude: 0
@@ -3670,6 +3671,11 @@ PrefabInstance:
       propertyPath: targetPoint
       value: 
       objectReference: {fileID: 1681727416}
+    - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
+        type: 3}
+      propertyPath: amountOfBoids
+      value: 500
+      objectReference: {fileID: 0}
     - target: {fileID: 5102875669989927247, guid: 4c52fd4429c38b848bdfbbf613ac6acc,
         type: 3}
       propertyPath: repulsionArea

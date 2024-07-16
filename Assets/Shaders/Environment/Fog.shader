@@ -55,6 +55,7 @@ Shader "Unlit/Fog"
            }
 
 
+           // manipulating the color according to the calculated depth.
             half4 frag(v2f i) : SV_TARGET
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);

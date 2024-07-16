@@ -16,6 +16,15 @@ int step;
 float t[MAX_STATES * MAX_STATES * MAX_STATES];
 
 
+/**
+ * @brief Resets the value of a pixel in the renderT and statesT textures based on its ID.
+ * If the pixel ID is on the first row and within a certain range from the center of the texture, a random value
+ * based on the ID is calculated and set in the statesT texture. Otherwise, the pixel value is set to 0 in both
+ * renderT and statesT textures.
+ * @param id The DispatchThreadID of the current pixel.
+ * @remarks This method requires the renderT and statesT textures to be defined in the EOCCompute.compute shader.
+ * @note The rez and highState variables must be set prior to calling this method.
+ */
 [numthreads(32, 32, 1)]
 void ResetK(uint3 id : SV_DispatchThreadID)
 {
@@ -34,12 +43,8 @@ void ResetK(uint3 id : SV_DispatchThreadID)
 
 /**
  * @brief Executes a single step of the StepK algorithm on a specified pixel.
- *
- * This method is part of the EOCCompute.compute shader and is invoked by the StepK kernel.
  * It calculates the next state of a pixel based on its surrounding neighbors' states.
- *
  * @param id The thread ID for the current pixel.
- *
  * @note This method uses the statesT, rez, and t variables defined in the EOCCompute.compute shader.
  */
 [numthreads(32, 1, 1)]
@@ -58,7 +63,7 @@ void StepK(uint3 id : SV_DispatchThreadID)
 }
 
 
-// http://www.chilliant.com/rgb2hsv.html
+// source http://www.chilliant.com/rgb2hsv.html
 float3 HUEtoRGB(in float H)
 {
     float R = abs(H * 6 - 3) - 1;
@@ -67,16 +72,16 @@ float3 HUEtoRGB(in float H)
     return saturate(float3(R, G, B));
 }
 
+
 /**
- * @brief Renders a pixel based on the state value at the given thread ID.
- *
+ * @brief Executes the RenderK function on a specified pixel.
+ It takes the ID of the dispatch thread and updates the renderT texture with the computed color for the pixel.
  * @param id The thread ID for the current pixel.
  */
 [numthreads(32, 32, 1)]
 void RenderK(uint3 id : SV_DispatchThreadID)
 {
     int s = statesT[id.xy];
-    //float3 h = s / (float) highState;
     float3 h = HUEtoRGB(float(s) / highState);
     if (s == 0)
     {

@@ -1,304 +1,241 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AgentCCA : MonoBehaviour
-{
-    [Header("Trail Agent Params")]
-    [Range(64, 1000000)]
-    public int agentsCount = 1;
-    private ComputeBuffer agentsBuffer;
+public class AgentCCA : MonoBehaviour {
 
-    [Range(0, 1)]
-    public float trailDecayFactor = .9f;
+    #region Constants and Statics
 
+    private static readonly int WriteTex = Shader.PropertyToID("writeTex");
+    private static readonly int Rez = Shader.PropertyToID("rez");
+    private static readonly int Time1 = Shader.PropertyToID("time");
+    private static readonly int AgentsBuffer = Shader.PropertyToID("agentsBuffer");
+    private static readonly int StepN = Shader.PropertyToID("stepN");
+    private static readonly int ReadTex = Shader.PropertyToID("readTex");
+    private static readonly int TrailDecayFactor = Shader.PropertyToID("trailDecayFactor");
+    private static readonly int DebugTex = Shader.PropertyToID("debugTex");
+    private static readonly int BaseMap = Shader.PropertyToID("_BaseMap");
+    private static readonly int OutTex = Shader.PropertyToID("outTex");
 
-    [Header("Mouse Input")]
-    [Range(0, 100)]
-    public int brushSize = 10;
-    public GameObject interactivePlane;
-    protected Vector2 hitXY;
+    private const string AgentsDebugKernel = "AgentsDebugKernel";
+    private const string MoveAgentsKernel = "MoveAgentsKernel";
+    private const string RenderKernel = "RenderKernel";
+    private const string WriteTrailsKernel = "WriteTrailsKernel";
+    private const string DiffuseTextureKernel = "DiffuseTextureKernel";
+    private const string ResetTextureKernel = "ResetTextureKernel";
+    private const string ResetAgentsKernel = "ResetAgentsKernel";
 
-
-    [Header("Setup")]
-    [Range(8, 2048)]
-    public int rez = 8;
-
-    [Range(0, 50)]
-    public int stepsPerFrame = 0;
-
-    [Range(1, 50)]
-    public int stepMod = 1;
-
+    #endregion
+    
     public Material outMat;
     public ComputeShader cs;
+    
+    [Header("Trail Agent Setup")] 
+    [Range(64, 1000000)] public int agentsCount = 1;
+    [Range(0, 1)] public float trailDecayFactor = .9f;
 
-    private RenderTexture readTex;
-    private RenderTexture writeTex;
-    private RenderTexture outTex;
-    private RenderTexture debugTex;
-
-    private int agentsDebugKernel;
-    private int moveAgentsKernel;
-    private int writeTrailsKernel;
-    private int renderKernel;
-    private int diffuseTextureKernel;
+    [Header(" Scene Setup")] 
+    [Range(8, 2048)] [SerializeField] private int rez = 8;
+    [Range(0, 50)] [SerializeField] private int stepsPerFrame = 0;
+    [Range(1, 50)] [SerializeField] private int stepMod = 1;
 
 
-    protected List<ComputeBuffer> buffers;
-    protected List<RenderTexture> textures;
+    private RenderTexture _readTex;
+    private RenderTexture _writeTex;
+    private RenderTexture _outTex;
+    private RenderTexture _debugTex;
 
-    protected int stepn = -1;
+    private int _agentsDebugKernel;
+    private int _moveAgentsKernel;
+    private int _writeTrailsKernel;
+    private int _renderKernel;
+    private int _diffuseTextureKernel;
 
-    /* 
-    *
-    *
-    * RESET
-    *
-    *
-    */
 
-    void Start()
-    {
+    private ComputeBuffer _agentsBuffer;
+    private List<ComputeBuffer> _buffers;
+    private List<RenderTexture> _textures;
+    private int _stepN = -1;
+
+    void Start() {
         Reset();
     }
-
     
-    public void Reset()
-    {
-        agentsDebugKernel = cs.FindKernel("AgentsDebugKernel");
-        moveAgentsKernel = cs.FindKernel("MoveAgentsKernel");
-        renderKernel = cs.FindKernel("RenderKernel");
-        writeTrailsKernel = cs.FindKernel("WriteTrailsKernel");
-        diffuseTextureKernel = cs.FindKernel("DiffuseTextureKernel");
+    void Update() {
+        if (Time.frameCount % stepMod != 0) return;
+        for (int i = 0; i < stepsPerFrame; i++) {
+            Step();
+        }
+    }
+    
+    private void OnDestroy() {
+        Release();
+    }
 
-        readTex = CreateTexture(rez, FilterMode.Point);
-        writeTex = CreateTexture(rez, FilterMode.Point);
-        outTex = CreateTexture(rez, FilterMode.Point);
-        debugTex = CreateTexture(rez, FilterMode.Point);
+    private void OnEnable() {
+        Release();
+    }
 
-        agentsBuffer = new ComputeBuffer(agentsCount, sizeof(float) * 4);
-        buffers.Add(agentsBuffer);
+    private void OnDisable() {
+        Release();
+    }
 
-        GPUResetKernel();
+    public void Reset() {
+        _agentsDebugKernel = cs.FindKernel(AgentsDebugKernel);
+        _moveAgentsKernel = cs.FindKernel(MoveAgentsKernel);
+        _renderKernel = cs.FindKernel(RenderKernel);
+        _writeTrailsKernel = cs.FindKernel(WriteTrailsKernel);
+        _diffuseTextureKernel = cs.FindKernel(DiffuseTextureKernel);
+
+        _readTex = CreateTexture(rez, FilterMode.Point);
+        _writeTex = CreateTexture(rez, FilterMode.Point);
+        _outTex = CreateTexture(rez, FilterMode.Point);
+        _debugTex = CreateTexture(rez, FilterMode.Point);
+
+        _agentsBuffer = new ComputeBuffer(agentsCount, sizeof(float) * 4);
+        _buffers.Add(_agentsBuffer);
+
+        SetupForResetKernel();
         Render();
     }
 
-    private void GPUResetKernel()
-    {
+
+    /// <summary>
+    /// Sets up the necessary parameters and resources for the <c>ResetKernel</c> in the <c>ComputeShader</c>.
+    /// </summary>
+    private void SetupForResetKernel() {
         int kernel;
 
-        cs.SetInt("rez", rez);
-        cs.SetInt("time", Time.frameCount);
+        cs.SetInt(Rez, rez);
+        cs.SetInt(Time1, Time.frameCount);
 
-        kernel = cs.FindKernel("ResetTextureKernel");
-        cs.SetTexture(kernel, "writeTex", writeTex);
+        kernel = cs.FindKernel(ResetTextureKernel);
+        cs.SetTexture(kernel, WriteTex, _writeTex);
         cs.Dispatch(kernel, rez, rez, 1);
-
-        cs.SetTexture(kernel, "writeTex", readTex);
+        cs.SetTexture(kernel, WriteTex, _readTex);
         cs.Dispatch(kernel, rez, rez, 1);
-
-
-        kernel = cs.FindKernel("ResetAgentsKernel");
-        cs.SetBuffer(kernel, "agentsBuffer", agentsBuffer);
+        
+        kernel = cs.FindKernel(ResetAgentsKernel);
+        cs.SetBuffer(kernel, AgentsBuffer, _agentsBuffer);
         cs.Dispatch(kernel, agentsCount / 64, 1, 1);
     }
 
+    /// <summary>
+    /// Executes a single step of the simulation by updating the necessary parameters and resources for the simulation kernels.
+    /// </summary>
+    private void Step() {
+        _stepN += 1;
+        cs.SetInt(Time1, Time.frameCount);
+        cs.SetInt(StepN, _stepN);
 
-    /* 
-    *
-    *
-    * STEP
-    *
-    *
-    */
-    void Update()
-    {
+        SetupForMoveAgentsKernel();
 
-        if (Time.frameCount % stepMod == 0)
-        {
-            for (int i = 0; i < stepsPerFrame; i++)
-            {
-                Step();
-            }
-        }
-
-    }
-    
-    public void Step()
-    {
-
-        //HandleInput();
-
-
-        stepn += 1;
-        cs.SetInt("time", Time.frameCount);
-        cs.SetInt("stepn", stepn);
-        cs.SetInt("brushSize", brushSize);
-        cs.SetVector("hitXY", hitXY);
-
-        GPUMoveAgentsKernel();
-
-        if (stepn % 2 == 1)
-        {
-            GPUDiffuseTextureKernel();
-            GPUWriteTrailsKernel();
+        if (_stepN % 2 == 1) {
+            SetupForDiffuseTextureKernel();
+            SetupForWriteTrailsKernel();
             SwapTex();
         }
 
         Render();
     }
 
-    void HandleInput()
-    {
-        if (!Input.GetMouseButton(0))
-        {
-            hitXY.x = hitXY.y = 0;
-            return;
-        }
-
-        RaycastHit hit;
-        if (!Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
-        {
-            return;
-        }
-
-
-        if (hit.transform != interactivePlane.transform)
-        {
-            return;
-        }
-
-        hitXY = hit.textureCoord * rez;
+    /// <summary>
+    /// Sets up the necessary parameters and resources for the WriteTrailsKernel.
+    /// </summary>
+    private void SetupForWriteTrailsKernel() {
+        cs.SetBuffer(_writeTrailsKernel, AgentsBuffer, _agentsBuffer);
+        cs.SetTexture(_writeTrailsKernel, WriteTex, _writeTex);
+        cs.Dispatch(_writeTrailsKernel, agentsCount / 64, 1, 1);
     }
 
-    private void GPUDiffuseTextureKernel()
-    {
-        cs.SetTexture(diffuseTextureKernel, "readTex", readTex);
-        cs.SetTexture(diffuseTextureKernel, "writeTex", writeTex);
-        cs.SetFloat("trailDecayFactor", trailDecayFactor);
+    private void SwapTex() {
+        (_readTex, _writeTex) = (_writeTex, _readTex);
+    }
 
-        cs.Dispatch(diffuseTextureKernel, rez, rez, 1);
+    /// <summary>
+    /// Sets up the necessary parameters and resources for the RenderKernel.
+    /// </summary>
+    private void Render() {
+        SetupForRenderKernel();
+        SetupAgentsForDebugKernel();
+        outMat.SetTexture(BaseMap, _outTex);
     }
 
 
-    private void GPUMoveAgentsKernel()
-    {
-        cs.SetBuffer(moveAgentsKernel, "agentsBuffer", agentsBuffer);
-        cs.SetTexture(moveAgentsKernel, "readTex", readTex);
-        cs.SetTexture(moveAgentsKernel, "debugTex", debugTex);
-
-        cs.Dispatch(moveAgentsKernel, agentsCount / 64, 1, 1);
-    }
-
-    private void GPUWriteTrailsKernel()
-    {
-        cs.SetBuffer(writeTrailsKernel, "agentsBuffer", agentsBuffer);
-
-        cs.SetTexture(writeTrailsKernel, "writeTex", writeTex);
-
-        cs.Dispatch(writeTrailsKernel, agentsCount / 64, 1, 1);
-    }
-
-    private void SwapTex()
-    {
-        RenderTexture tmp = readTex;
-        readTex = writeTex;
-        writeTex = tmp;
-    }
-
-    /* 
-    *
-    *
-    * RENDER
-    *
-    *
-    */
-    private void Render()
-    {
-        GPURenderKernel();
-        GPUAgentsDebugKernel();
-
-        outMat.SetTexture("_BaseMap", outTex);
-        // if (!Application.isPlaying)
-        // {
-        //     UnityEditor.SceneView.RepaintAll();
-        // }
+    /// <summary>
+    /// Sets up the necessary parameters and resources for the RenderKernel.
+    /// </summary>
+    private void SetupForRenderKernel() {
+        cs.SetTexture(_renderKernel, ReadTex, _readTex);
+        cs.SetTexture(_renderKernel, OutTex, _outTex);
+        cs.SetTexture(_renderKernel, DebugTex, _debugTex);
+        cs.Dispatch(_renderKernel, rez, rez, 1);
     }
 
 
-    private void GPURenderKernel()
-    {
-        cs.SetTexture(renderKernel, "readTex", readTex);
-        cs.SetTexture(renderKernel, "outTex", outTex);
-        cs.SetTexture(renderKernel, "debugTex", debugTex);
+    /// <summary>
+    /// Sets up the necessary parameters and resources for the AgentsDebugKernel.
+    /// </summary>
+    private void SetupAgentsForDebugKernel() {
+        cs.SetBuffer(_agentsDebugKernel, AgentsBuffer, _agentsBuffer);
+        cs.SetTexture(_agentsDebugKernel, OutTex, _outTex);
+        cs.Dispatch(_agentsDebugKernel, agentsCount / 64, 1, 1);
+    }
 
-        cs.Dispatch(renderKernel, rez, rez, 1);
+    /// <summary>
+    /// Sets up the necessary parameters and resources for the DiffuseTextureKernel.
+    /// </summary>
+    private void SetupForDiffuseTextureKernel() {
+        cs.SetTexture(_diffuseTextureKernel, ReadTex, _readTex);
+        cs.SetTexture(_diffuseTextureKernel, WriteTex, _writeTex);
+        cs.SetFloat(TrailDecayFactor, trailDecayFactor);
+        cs.Dispatch(_diffuseTextureKernel, rez, rez, 1);
     }
 
 
-    private void GPUAgentsDebugKernel()
-    {
-        cs.SetBuffer(agentsDebugKernel, "agentsBuffer", agentsBuffer);
-        cs.SetTexture(agentsDebugKernel, "outTex", outTex);
-
-        cs.Dispatch(agentsDebugKernel, agentsCount / 64, 1, 1);
+    /// <summary>
+    /// Sets up the necessary parameters and resources for the MoveAgentsKernel.
+    /// </summary>
+    private void SetupForMoveAgentsKernel() {
+        cs.SetBuffer(_moveAgentsKernel, AgentsBuffer, _agentsBuffer);
+        cs.SetTexture(_moveAgentsKernel, ReadTex, _readTex);
+        cs.SetTexture(_moveAgentsKernel, DebugTex, _debugTex);
+        cs.Dispatch(_moveAgentsKernel, agentsCount / 64, 1, 1);
     }
 
-    /* 
-    *
-    *
-    * Util
-    *
-    *
-    */
-    public void Release()
-    {
-        if (buffers != null)
-        {
-            foreach (ComputeBuffer buffer in buffers)
-            {
-                if (buffer != null)
-                {
+
+    /// <summary>
+    /// Releases all the ComputeBuffers and RenderTextures used by the AgentCCA class.
+    /// </summary>
+    private void Release() {
+        if (_buffers != null) {
+            foreach (ComputeBuffer buffer in _buffers) {
+                if (buffer != null) {
                     buffer.Release();
                 }
             }
         }
 
-        buffers = new List<ComputeBuffer>();
+        _buffers = new List<ComputeBuffer>();
 
-        if (textures != null)
-        {
-            foreach (RenderTexture tex in textures)
-            {
-                if (tex != null)
-                {
+        if (_textures != null) {
+            foreach (RenderTexture tex in _textures) {
+                if (tex != null) {
                     tex.Release();
                 }
             }
         }
 
-        textures = new List<RenderTexture>();
-
-    }
-    private void OnDestroy()
-    {
-        Release();
+        _textures = new List<RenderTexture>();
     }
 
-    private void OnEnable()
-    {
-        Release();
-    }
-
-    private void OnDisable()
-    {
-        Release();
-    }
-
-    protected RenderTexture CreateTexture(int r, FilterMode filterMode)
-    {
-        RenderTexture texture = new RenderTexture(r, r, 1, RenderTextureFormat.ARGBFloat);
+    /// <summary>
+    /// Creates a new RenderTexture with the specified dimensions and filter mode.
+    /// </summary>
+    /// <param name="r">The width and height of the RenderTexture.</param>
+    /// <param name="filterMode">The filter mode to be applied to the texture.</param>
+    /// <returns>The created RenderTexture.</returns>
+    private RenderTexture CreateTexture(int r, FilterMode filterMode) {
+        var texture = new RenderTexture(r, r, 1, RenderTextureFormat.ARGBFloat);
 
         texture.name = "out";
         texture.enableRandomWrite = true;
@@ -309,7 +246,7 @@ public class AgentCCA : MonoBehaviour
         texture.autoGenerateMips = false;
         texture.useMipMap = false;
         texture.Create();
-        textures.Add(texture);
+        _textures.Add(texture);
 
         return texture;
     }
