@@ -2,7 +2,7 @@ using LevelManagement.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace LevelManagement {
+namespace LevelManagement.Scenes {
     public class ScenesManager : Singleton<ScenesManager>
     {
         public void LoadScene(Scene scene) {
@@ -16,7 +16,5 @@ namespace LevelManagement {
         public void QuitGame() {
             Application.Quit();
         }
-        
-    
     }
 }

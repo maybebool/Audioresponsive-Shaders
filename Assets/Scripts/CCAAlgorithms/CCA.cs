@@ -23,6 +23,8 @@ namespace CCAAlgorithms {
 
         #endregion
 
+        #region Variables
+
         [Header("CCA Setup")]
         [Range(1, MAX_RANGE)] [SerializeField] private int range = 2;
         [Range(0, MAX_THRESHOLD)] [SerializeField] private int threshold = 8;
@@ -52,6 +54,10 @@ namespace CCAAlgorithms {
         private float _sMin = 0;
         private float _vMax = 1;
         private float _vMin = 0;
+
+        #endregion
+
+        
     
         private void Update() {
             if (Time.frameCount % stepMod != 0) return;

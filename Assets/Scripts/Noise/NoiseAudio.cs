@@ -28,6 +28,12 @@ namespace Noise {
         }
 
 
+        /// <summary>
+        /// Sets the audio reactive parameters for the NoiseAudio instance.
+        /// </summary>
+        /// <remarks>
+        /// This method is called in the Update method and updates the audio reactive parameters based on the audio data and user-defined settings.
+        /// </remarks>
         private void SetAudioReactiveParameters() {
             if (useSaturation) {
                 if (audioData.amplitudeBuffer > threshold) {

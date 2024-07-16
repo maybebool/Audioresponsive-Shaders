@@ -2,19 +2,21 @@ using UnityEngine;
 
 namespace Noise {
     public abstract class NoiseGridInstance : MonoBehaviour {
+        
         private const string InTex = "_inTex";
         private const string Rez = "_Rez";
         
-
         public uint rez = 64; 
         public CustomRenderTexture inTex; 
-    
         public Material outMat; 
         public Mesh iMesh;
     
         protected ComputeBuffer _bufferArgumentsData;
         protected Bounds _bounds;
-    
+
+        /// <summary>
+        /// Initializes the NoiseGridInstance by setting up the compute buffer, bounds, and material properties.
+        /// </summary>
         private void Start()
         {
             _bufferArgumentsData = new ComputeBuffer(5, sizeof(int), ComputeBufferType.IndirectArguments);

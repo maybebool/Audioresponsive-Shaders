@@ -1,5 +1,5 @@
-using System;
 using CCAAlgorithms;
+using LevelManagement.Scenes;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,9 +10,7 @@ namespace LevelManagement.UIs {
         [SerializeField] private EOCCCA eoc;
         [SerializeField] private Toggle randomizingYesNo;
         [SerializeField] private Slider stepsPerFrame;
-
         
-
         private void OnEnable() {
             backToMenuButton.onClick.AddListener(OnClickBackToMenu);
             randomizingYesNo.onValueChanged.AddListener(OnClickToggleRandomize);

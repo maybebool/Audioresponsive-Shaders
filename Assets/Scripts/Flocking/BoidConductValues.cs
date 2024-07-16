@@ -2,10 +2,7 @@
 
 namespace Flocking {
     
-    public interface IBoidData { }
-    
-    public struct BoidConductValues : IBoidData {
-        
+    public struct BoidConductValues {
         public Vector3 position { get; set; }
         public Vector3 forward { get; set; }
         public Vector3 raySteer { get; set; }

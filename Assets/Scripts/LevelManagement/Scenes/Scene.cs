@@ -7,6 +7,5 @@
         CCA,
         AgentCCA,
         Noise
-        
     }
 }
