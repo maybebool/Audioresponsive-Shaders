@@ -8,7 +8,7 @@ namespace CCAAlgorithms {
 
         private static readonly int WriteTex = Shader.PropertyToID("writeTex");
         private static readonly int Rez = Shader.PropertyToID("rez");
-        private static readonly int Time1 = Shader.PropertyToID("time");
+        private static readonly int Time = Shader.PropertyToID("time");
         private static readonly int AgentsBuffer = Shader.PropertyToID("agentsBuffer");
         private static readonly int StepN = Shader.PropertyToID("stepN");
         private static readonly int ReadTex = Shader.PropertyToID("readTex");
@@ -62,7 +62,7 @@ namespace CCAAlgorithms {
         }
     
         void Update() {
-            if (Time.frameCount % stepMod != 0) return;
+            if (UnityEngine.Time.frameCount % stepMod != 0) return;
             for (int i = 0; i < stepsPerFrame; i++) {
                 Step();
             }
@@ -107,7 +107,7 @@ namespace CCAAlgorithms {
             int kernel;
 
             cs.SetInt(Rez, rez);
-            cs.SetInt(Time1, Time.frameCount);
+            cs.SetInt(Time, UnityEngine.Time.frameCount);
 
             kernel = cs.FindKernel(ResetTextureKernel);
             cs.SetTexture(kernel, WriteTex, _writeTex);
@@ -125,7 +125,7 @@ namespace CCAAlgorithms {
         /// </summary>
         private void Step() {
             _stepN += 1;
-            cs.SetInt(Time1, Time.frameCount);
+            cs.SetInt(Time, UnityEngine.Time.frameCount);
             cs.SetInt(StepN, _stepN);
 
             SetupForMoveAgentsKernel();
