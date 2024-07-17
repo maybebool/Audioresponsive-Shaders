@@ -2690,7 +2690,7 @@ MonoBehaviour:
   amplitude: 0
   amplitudeBuffer: 0
   audioSource: {fileID: 1940616894}
-  audioClip: {fileID: 8300000, guid: 2b7f2247fccdeb74c8b0d0063b46ff15, type: 3}
+  audioClip: {fileID: 8300000, guid: 849a3b3faab544d49906b6c65428b8d9, type: 3}
 --- !u!82 &1940616894
 AudioSource:
   m_ObjectHideFlags: 0
