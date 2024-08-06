@@ -432,7 +432,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.27691582, g: 1, b: 0.24056602, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1479,6 +1479,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5664bbbb6557fd74ca1b72f9e5f85419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bandCount: 8
   audioBand: []
   audioBandBuffer: []
   amplitude: 0
@@ -2152,13 +2153,13 @@ MonoBehaviour:
   rez: 128
   inTex: {fileID: 8600000, guid: cca7077f62345c54ab02e1555e680954, type: 2}
   outMat: {fileID: 2100000, guid: 4b1e5a54732f22f4d92d694952e4558a, type: 2}
-  iMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  iMesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
   audioData: {fileID: 860698049}
   audioMatValues: {fileID: 2100000, guid: a3b54ab697dd457419ca92b25a1f66f6, type: 2}
   useSaturation: 1
   useAmplitude: 1
   minMaxSaturation: {x: 0, y: 2}
-  minMaxAmplitude: {x: 5, y: 20}
+  minMaxAmplitude: {x: 5, y: 10}
   threshold: 0
 --- !u!1 &1347378391
 GameObject:
