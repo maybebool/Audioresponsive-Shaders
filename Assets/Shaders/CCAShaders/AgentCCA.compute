@@ -39,14 +39,11 @@ float2 RandomDirection(float2 p) {
 	return (normalize(2.0 * (Random(p) - 0.5)));
 }
 
-
-
 [numthreads(1, 1, 1)]
 void ResetTextureKernel(uint3 id : SV_DispatchThreadID)
 {
 	writeTex[id.xy] = 0;
 }
-
 
 /**
  * @brief Resets the agents in the kernel
@@ -68,7 +65,6 @@ void ResetAgentsKernel(uint3 id : SV_DispatchThreadID)
 
 	agentsBuffer[id.x] = a;
 }
-
 
 /**
  * @brief Writes the trails created by the agents to the writeTex texture
@@ -208,8 +204,7 @@ void DiffuseTextureKernel(uint3 id : SV_DispatchThreadID)
 
 	oc = avg * trailDecayFactor;
 	oc = clamp(oc, 0, 1);
-
-
+	
 	if ((hitXY.x != 0 && hitXY.y != 0) && distance(hitXY, id.xy) < brushSize) {
 		oc += 10;
 	}
@@ -224,8 +219,6 @@ void RenderKernel(uint3 id : SV_DispatchThreadID)
 	outTex[id.xy] += debugTex[id.xy];
 	debugTex[id.xy] = 0;
 }
-
-
 
 [numthreads(64, 1, 1)]
 void AgentsDebugKernel(uint3 id : SV_DispatchThreadID)
