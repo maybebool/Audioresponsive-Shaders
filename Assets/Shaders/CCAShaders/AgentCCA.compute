@@ -113,7 +113,7 @@ float2 NeighborhoodTurns(uint3 id, Agent a) {
 					}
 
 					if (stepN % 2 == 0) {
-						// marks de neighbour blue 
+						// marks the neighbour blue 
 						debugTex[coord] = float4(0, 0, 0.5, 0);
 					}
 				}
